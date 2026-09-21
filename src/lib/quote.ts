@@ -14,10 +14,16 @@ export function safeCart(value: unknown): CartLine[] {
 export function loadCart(): CartLine[] {
   try { return safeCart(JSON.parse(localStorage.getItem('lyndons-quote-v1') ?? '[]')); } catch { return []; }
 }
+export function hasRetiredCartItems(): boolean {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem('lyndons-quote-v1') ?? '[]');
+    return Array.isArray(saved) && saved.some(line => line && typeof line.id === 'string' && !products.some(p => p.id === line.id));
+  } catch { return false; }
+}
 export function quoteText(cart: CartLine[], d: QuoteDetails): string {
   return ['LYNDONS — QUOTE REQUEST (NOT AN ORDER)', '', ...cart.map(line => {
     const p = products.find(product => product.id === line.id)!;
-    return `${line.quantity} × ${p.name} | ${p.pack} | Ref: ${p.id}\n${p.source}`;
+    return `${line.quantity} × ${p.name} | ${p.pack} | Ref: ${p.sourceSku ?? p.id}\n${p.source}`;
   }), '', `Name: ${d.name}`, `Company: ${d.company || '—'}`, `Email: ${d.email}`, `Phone: ${d.phone}`, `Trade account: ${d.account || '—'}`, `Preferred branch: ${d.branch}`, `Collection / delivery: ${d.fulfilment}`, ...(d.fulfilment === 'delivery' ? [`Delivery address: ${d.address}`] : []), `Requested date (not guaranteed): ${d.date || 'To be discussed'}`, `Other products / job notes: ${d.notes || '—'}`, '', 'Please confirm pricing, availability, delivery costs and product suitability. No payment is included.'].join('\n');
 }
 // Integration seam: resolve only on an authenticated server, never from a client-side account number.

@@ -1,0 +1,310 @@
+[
+  {
+    "brands": [
+      "MasterFinish"
+    ],
+    "label": "A.G. Pulie / MasterFinish",
+    "url": "https://www.agpulie.com.au/DOWNLOADS",
+    "scope": "Supplier catalogue library; exact product matching required",
+    "status": 200,
+    "resolvedUrl": "https://www.agpulie.com.au/DOWNLOADS",
+    "checkedAt": "2026-09-21T11:21:54.451Z"
+  },
+  {
+    "brands": [
+      "Ox"
+    ],
+    "label": "OX Tools Australia",
+    "url": "https://www.oxtools.com.au/catalogues/",
+    "scope": "Official Australian catalogue library",
+    "status": 200,
+    "resolvedUrl": "https://www.oxtools.com.au/catalogues/",
+    "checkedAt": "2026-09-21T11:21:54.625Z"
+  },
+  {
+    "brands": [
+      "UniPro"
+    ],
+    "label": "UNi-PRO",
+    "url": "https://www.unipro.com.au/shop/",
+    "scope": "Official product directory",
+    "status": 200,
+    "resolvedUrl": "https://www.unipro.com.au/shop/",
+    "checkedAt": "2026-09-21T11:21:54.819Z"
+  },
+  {
+    "brands": [
+      "Flextool"
+    ],
+    "label": "Flextool",
+    "url": "https://www.flextool.com.au/resources/product-catalogue/",
+    "scope": "Official equipment catalogue; also distributes other brands",
+    "status": 200,
+    "resolvedUrl": "https://www.flextool.com.au/resources/product-catalogue/",
+    "checkedAt": "2026-09-21T11:21:54.953Z"
+  },
+  {
+    "brands": [
+      "Ramset"
+    ],
+    "label": "Ramset Australia",
+    "url": "https://ramset.com.au/resources-hub/",
+    "scope": "Technical resources and catalogues",
+    "status": 200,
+    "resolvedUrl": "https://ramset.com.au/resources-hub/",
+    "checkedAt": "2026-09-21T11:21:56.656Z"
+  },
+  {
+    "brands": [
+      "RapidTool"
+    ],
+    "label": "RAPIDTOOL",
+    "url": "https://rapidtool.com.au/rapidtool-catalogue/",
+    "scope": "Official rebar equipment catalogue",
+    "status": 200,
+    "resolvedUrl": "https://rapidtool.com.au/rapidtool-catalogue/",
+    "checkedAt": "2026-09-21T11:21:56.808Z"
+  },
+  {
+    "brands": [
+      "PROMAC"
+    ],
+    "label": "Promac Tools",
+    "url": "https://promac.com.au/collections/all",
+    "scope": "Distributor directory; do not equate distributor with manufacturer",
+    "status": 200,
+    "resolvedUrl": "https://promac.com.au/collections/all",
+    "checkedAt": "2026-09-21T11:21:57.273Z"
+  },
+  {
+    "brands": [
+      "Stabila"
+    ],
+    "label": "Stabila Australia",
+    "url": "https://www.stabila.com.au/",
+    "scope": "Regional measurement-tool website",
+    "status": 200,
+    "resolvedUrl": "https://www.stabila.com.au/",
+    "checkedAt": "2026-09-21T11:21:57.662Z"
+  },
+  {
+    "brands": [
+      "TOPCON"
+    ],
+    "label": "Topcon Positioning",
+    "url": "https://www.topconpositioning.com/",
+    "scope": "Official positioning equipment website; kits need exact matching",
+    "status": 200,
+    "resolvedUrl": "https://www.topconpositioning.com/",
+    "checkedAt": "2026-09-21T11:21:58.018Z"
+  },
+  {
+    "brands": [
+      "Husqvarna"
+    ],
+    "label": "Husqvarna Construction Australia",
+    "url": "https://www.husqvarnaconstruction.com/au/",
+    "scope": "Official Australian construction equipment website",
+    "status": 200,
+    "resolvedUrl": "https://www.husqvarnaconstruction.com/au/",
+    "checkedAt": "2026-09-21T11:21:59.539Z"
+  },
+  {
+    "brands": [
+      "Rockcote"
+    ],
+    "label": "Rockcote",
+    "url": "https://rockcote.com.au/products/",
+    "scope": "Official render and finish product directory",
+    "status": 200,
+    "resolvedUrl": "https://rockcote.com.au/products/",
+    "checkedAt": "2026-09-21T11:21:59.662Z"
+  },
+  {
+    "brands": [
+      "Sika"
+    ],
+    "label": "Sika Australia",
+    "url": "https://aus.sika.com/",
+    "scope": "Australian product and technical resources",
+    "status": 200,
+    "resolvedUrl": "https://aus.sika.com/",
+    "checkedAt": "2026-09-21T11:22:01.308Z"
+  },
+  {
+    "brands": [
+      "FOSROC"
+    ],
+    "label": "Fosroc Australia",
+    "url": "https://www.fosroc.com.au/",
+    "scope": "Australian product website; confirm legacy product/formulation equivalence",
+    "status": 200,
+    "resolvedUrl": "https://www.fosroc.com.au/",
+    "checkedAt": "2026-09-21T11:22:01.634Z"
+  },
+  {
+    "brands": [
+      "CCS"
+    ],
+    "label": "Concrete Colour Systems",
+    "url": "https://concretecoloursystems.com.au/data-sheets-guidelines",
+    "scope": "Manufacturer technical and safety data library",
+    "status": 200,
+    "resolvedUrl": "https://concretecoloursystems.com.au/data-sheets-guidelines",
+    "checkedAt": "2026-09-21T11:22:01.821Z"
+  },
+  {
+    "brands": [
+      "Soudal"
+    ],
+    "label": "Soudal Australia",
+    "url": "https://soudal.com.au/",
+    "scope": "Australian sealants and adhesives website",
+    "status": 200,
+    "resolvedUrl": "https://soudal.com.au/",
+    "checkedAt": "2026-09-21T11:22:01.939Z"
+  },
+  {
+    "brands": [
+      "Supa Coat"
+    ],
+    "label": "Supa Coat",
+    "url": "https://supacoat.com.au/",
+    "scope": "Render product website; current product sheet required",
+    "status": 200,
+    "resolvedUrl": "https://supacoat.com.au/",
+    "checkedAt": "2026-09-21T11:22:02.239Z"
+  },
+  {
+    "brands": [
+      "Ezycoat"
+    ],
+    "label": "Active Building Systems / Ezycoat",
+    "url": "https://www.activebuildingsystems.com.au/",
+    "scope": "Building-materials Ezycoat; unrelated pet-grooming domain excluded",
+    "status": 200,
+    "resolvedUrl": "https://www.activebuildingsystems.com.au/",
+    "checkedAt": "2026-09-21T11:22:03.401Z"
+  },
+  {
+    "brands": [
+      "Easymix"
+    ],
+    "label": "Easy Mix",
+    "url": "https://www.easymixsales.com.au/",
+    "scope": "Official bagged product website",
+    "status": 200,
+    "resolvedUrl": "https://www.easymixsales.com.au/",
+    "checkedAt": "2026-09-21T11:22:03.572Z"
+  },
+  {
+    "brands": [
+      "Sunstate Cement"
+    ],
+    "label": "Sunstate Cement / OneMix",
+    "url": "https://sunstatecement.com.au/publications/product-data/",
+    "scope": "Cement product data; use OneMix documents for OneMix products",
+    "status": 200,
+    "resolvedUrl": "https://sunstatecement.com.au/publications/product-data/",
+    "checkedAt": "2026-09-21T11:22:04.780Z"
+  },
+  {
+    "brands": [
+      "Cement Australia"
+    ],
+    "label": "Cement Australia",
+    "url": "https://www.cementaustralia.com.au/safety-data-sheets",
+    "scope": "Official safety-data library",
+    "status": 200,
+    "resolvedUrl": "https://www.cementaustralia.com.au/safety-data-sheets",
+    "checkedAt": "2026-09-21T11:22:04.893Z"
+  },
+  {
+    "brands": [
+      "Lanotec"
+    ],
+    "label": "Lanotec",
+    "url": "https://lanotec.com.au/",
+    "scope": "Official lubricant and protective-coating website",
+    "status": 200,
+    "resolvedUrl": "https://lanotec.com.au/",
+    "checkedAt": "2026-09-21T11:22:05.349Z"
+  },
+  {
+    "brands": [
+      "Schneppa Glass"
+    ],
+    "label": "Schneppa Recycled Crushed Glass",
+    "url": "https://schnepparecycledcrushedglass.com.au/",
+    "scope": "Supplier website; not proof of manufacturing entity",
+    "status": 200,
+    "resolvedUrl": "https://schnepparecycledcrushedglass.com.au/",
+    "checkedAt": "2026-09-21T11:22:06.984Z"
+  },
+  {
+    "brands": [
+      "Danley"
+    ],
+    "label": "Danley",
+    "url": "https://danley.com.au/all-products",
+    "scope": "Slab-on-ground product systems",
+    "status": 200,
+    "resolvedUrl": "https://danley.com.au/all-products",
+    "checkedAt": "2026-09-21T11:22:07.229Z"
+  },
+  {
+    "brands": [
+      "Coloro"
+    ],
+    "label": "Coloro",
+    "url": "https://www.coloro.com.au/",
+    "scope": "Construction coatings and chemicals website",
+    "status": 200,
+    "resolvedUrl": "https://www.coloro.com.au/",
+    "checkedAt": "2026-09-21T11:22:07.503Z"
+  },
+  {
+    "brands": [
+      "ProChoice"
+    ],
+    "label": "Pro Choice Safety Gear",
+    "url": "https://prochoicesafetygear.com/catalogue",
+    "scope": "Official safety-equipment catalogue",
+    "status": 200,
+    "resolvedUrl": "https://prochoicesafetygear.com/catalogue",
+    "checkedAt": "2026-09-21T11:22:07.773Z"
+  },
+  {
+    "brands": [
+      "Mumme"
+    ],
+    "label": "Mumme Tools",
+    "url": "https://www.mummetools.com.au/",
+    "scope": "Official hand-tool website",
+    "status": 200,
+    "resolvedUrl": "https://www.mummetools.com.au/",
+    "checkedAt": "2026-09-21T11:22:07.925Z"
+  },
+  {
+    "brands": [
+      "Cyclone"
+    ],
+    "label": "Cyclone Tools",
+    "url": "https://cyclone.com.au/",
+    "scope": "Official hand-tool website",
+    "status": 200,
+    "resolvedUrl": "https://cyclone.com.au/",
+    "checkedAt": "2026-09-21T11:22:08.317Z"
+  },
+  {
+    "brands": [
+      "Abey"
+    ],
+    "label": "Abey Trade",
+    "url": "https://www.abeytrade.com.au/",
+    "scope": "Trade/building product range rather than kitchen showroom",
+    "status": 200,
+    "resolvedUrl": "https://www.abeytrade.com.au/",
+    "checkedAt": "2026-09-21T11:22:08.646Z"
+  }
+]

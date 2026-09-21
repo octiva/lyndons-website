@@ -1,46 +1,73 @@
-# Catalogue research & provenance
+# Public catalogue collection — 21 September 2026
 
-Research date: 21 September 2026. A curated 14-product preview, not a complete inventory.
+## Actual coverage
 
-## Broader catalogue found
+| Measure | Result |
+| --- | ---: |
+| Product sitemaps processed | 21 |
+| Public product pages discovered / collected | 2,061 / 2,061 |
+| Product / variant rows | 3,853 |
+| Original category groups | 18 |
+| Pages with descriptions | 1,889 |
+| Pages without descriptions | 172 |
+| Pages with product photos | 1,967 |
+| Pages without product photos | 94 |
+| Downloaded image references / unique image files | 2,134 / 2,063 |
+| Failed page or image downloads in main import | 0 |
+| Pages with no listed brand | 562 |
+| Verified reachable supplier resource entries | 28 |
+| Product pages linked to those brand-level resources | 976 |
 
-[Lyndons product catalogue, November 2022 (PDF)](https://lyndons.com.au/asset/download/914/d718a2/lyndons-catalogue-nov-22-final.pdf). Verified HTTP 200 / application/pdf; server last-modified 9 November 2022. Explicitly labelled archived in the UI. No newer complete public catalogue was verified. The [existing directory](https://lyndons.com.au/products) states that the company stocks over 10,000 products and that not all stocked products appear online. Neither a PDF nor an online listing proves present-day branch stock.
+These are **all product URLs found in the current public product sitemaps**, not all products stocked by Lyndons. The source website says it stocks over 10,000 products and not all are online. The distinction between pages, variants and images matters: 94 pages without photos correspond to 161 variant rows without photos.
 
-## Supplier resources verified
+## Downloaded Lyndons PDFs — correction to the initial research
 
-- [Sunstate products](https://sunstatecement.com.au/our-products/) and [technical data](https://sunstatecement.com.au/publications/product-data/). Manufacturer site links OneMix.
-- [Sika Australia](https://aus.sika.com/). The exact 212 HP listing is sourced from Lyndons; no guessed manufacturer product URL is published.
-- [A.G. Pulie range](https://www.agpulie.com.au/products/category) and [download library](https://www.agpulie.com.au/DOWNLOADS): MasterFinish and supplier catalogues.
-- [Concrete Colour Systems technical library](https://concretecoloursystems.com.au/data-sheets-guidelines).
-- [Topcon Positioning](https://www.topconpositioning.com/): kit contents must be confirmed with Lyndons.
-- [Supa Coat PM605B technical sheet](https://supacoat.com.au/wp-content/uploads/2023/07/TDS-PM605B-Pool-Basecoat-Render.pdf).
-- [Husqvarna Construction](https://www.husqvarnaconstruction.com/au/), [Lanotec](https://lanotec.com.au/), [Easy Mix](https://www.easymixsales.com.au/), [Schneppa Glass](https://schnepparecycledcrushedglass.com.au/).
+1. [Lyndons November 2022 PDF](../public/catalogues/lyndons-product-catalogue-november-2022.pdf), 4 pages, approximately 1.6MB. Original source: https://lyndons.com.au/asset/download/914/d718a2/lyndons-catalogue-nov-22-final.pdf. **Its filename says catalogue, but opening the actual PDF reveals an offers flyer for 1–30 November 2022.** It is not a full-range catalogue. Prices are expired and must not be imported into the storefront. The earlier description of this PDF as a broader/full-range reference was incorrect and has been corrected in the site.
+2. [Lyndons capability statement](../public/catalogues/lyndons-capability-statement.pdf), 20 pages, approximately 4.7MB. Original source: https://lyndons.com.au/asset/download/968/ef5a9a/lyndons-capability-statement-compressed.pdf. A company overview, not SKU inventory. Scanned pages provide no extracted text; publication date is not independently verified.
+3. [Flextool product catalogue v33](../public/catalogues/flextool-product-catalogue-v33.pdf), approximately 27MB. Original supplier link: https://www.flextool.com.au/media/efmn05pp/flextool-product-catalogue-v33-spread.pdf. A supplier catalogue, not evidence that every item is stocked by Lyndons.
 
-All published supplier/resource URLs and all 14 photo URLs returned HTTP 200 in the link audit. Reachability does not establish product equivalence, stock or image rights.
+PDF signatures, byte sizes and SHA-256 checksums are in [download manifest](../research/download-manifest.json). **No complete current Lyndons product PDF was verified** through the website, catalogue searches or available archive evidence. This does not establish that none exists privately.
 
-## Product records and unresolved gaps
+The RAPIDTOOL catalogue landing page is accessible, but its linked 2026 PDF returned HTTP 403. That download was not bypassed; the restriction is recorded in the manifest.
 
-[Structured catalogue](../src/data/catalog.ts) stores original listing URL, image URL, manufacturer/brand attribution, pack, rewritten description and checked date. No inferred price or availability is displayed.
+## Deliverables
 
-- **BESS2021:** no manufacturer on the source page. An ABG image filename and Besser-style code do not establish a manufacturer. Displayed as manufacturer to confirm.
-- **NRG14547:** listed as NRG / light base, but image filename says Rockcote / deep base. Shown with explicit detail-page caveat. Get current approved image and exact manufacturer/base before production.
-- **SGE626:** sold as 600mm; description specifies 626 × 58mm blade. Difference is disclosed.
-- **LANOTEC-400 and POLYGLOW-1KG:** internal preview IDs, not verified supplier SKUs. Ask the branch to confirm current ordering codes and pack.
-- **Bowser & Lever:** listed brand verified; underlying manufacturer not independently established. Do not silently relabel.
-- **Husqvarna blade / Topcon kit:** no invented RPM, bore, accuracy, compatibility or kit inclusions.
+- [Collected product spreadsheet](../public/data/lyndons-public-product-list.csv): 3,853 rows with source descriptions, codes, size/colour variants, categories, original photo URLs, supplier libraries and uncertainty notes. Excel-compatible UTF-8 BOM; spreadsheet formula-leading characters are neutralised.
+- [Coverage report](../public/data/catalogue-coverage.json).
+- [Supplier resources](../public/data/supplier-resources.json) and [HTTP verification audit](../research/supplier-audit.json).
+- [Source sitemap discovery](../research/catalogue/discovery.json) and [import report](../research/catalogue/report.json).
+- [Published product dataset](../src/data/generated/products.json); downloaded images are under the public product-image directory and included in the repository.
+- Local raw records, images and combined JSON/CSV are also retained under the research catalogue directory (ignored to avoid duplicating public assets in Git).
 
-## Photography and rights
+## How the import works
 
-Product photos are existing Lyndons listing images linked at their original URLs, **not newly commissioned or independently licensed manufacturer images**. Logo variants and hero photo were copied from the existing site. Ownership remains with the respective owners. Obtain Lyndons/supplier approval before broader commercial launch and replace outdated/ambiguous pack shots. Current manufacturer photography cannot be certified for every legacy SKU without supplier-code mapping. Failed photos have a visible fallback. Fonts are self-hosted Fontsource packages under their bundled open font licences.
+The collector checks the public robots policy, discovers 21 product sitemaps, uses three workers (maximum four), and stops on HTTP 403/429. It explicitly requests HTML: requests without the correct Accept header sometimes return only a cart fragment. It does not store raw HTML or customer/session tokens.
 
-## Branch data
+DOM extraction preserves the visible title, listed brand, description, breadcrumbs, gallery photo sources, variant labels and their exact product references. Generic placeholders are excluded from product photos. Missing data is flagged rather than guessed. The source's concatenated invalid Product JSON for variants is not trusted; variant dropdown IDs are matched against their labelled SKU elements.
 
-12 customer-facing branches, excluding head office and Carole Park steel-only no-sales location. Phones and public branch emails were checked against each original location page. No individual staff emails are used. Maroochydore is **maroochy@lyndons.com.au**, not an email derived from the town spelling. Addresses/hours link to source pages to avoid copying stale schedules.
+`npm run catalogue:collect` resumes from per-page records and existing photos. `npm run catalogue:prepare` verifies supplier resources, publishes local photos and prepares the application dataset. `node scripts/catalogue-manifest.mjs` validates PDFs and exports the public spreadsheet. Delete a specific cached record to refresh it; otherwise its original checked timestamp remains intact.
 
-## Completing the catalogue
+## Manufacturer and description confidence
 
-1. Get current ERP/POS export: SKU, supplier code, barcode, category, units, pack conversion, discontinued status, branch range and supplier ID. Keep customer prices out of public files.
-2. Reconcile against the archived PDF and supplier catalogues; do not label a supplier’s whole range as Lyndons stock.
-3. Match supplier codes to approved photos and current technical/safety sheets. Record permission/date and queue ambiguous matches for staff.
-4. Import top-selling products first with duplicate, variant and pack checks, then expand categories/search synonyms.
-5. Branch-manager approval per batch. Maintain via CMS/PIM or ERP feed; use paginated search for the full range.
+The collected descriptions are **as listed by Lyndons**, not 3,853 independently rewritten/current manufacturer descriptions. Thirteen previously curated products keep their reviewed wording. The remaining rows are explicitly labelled imported and require branch confirmation.
+
+The 28 supplier entries were reviewed against official websites, with HTTP responses recorded. This links 976 product pages to relevant **brand-level** libraries. It does **not** verify the manufacturer, current datasheet or correct modern replacement for every individual SKU. No company ownership facts are inferred from a matching domain or image filename.
+
+Examples of rejected or unresolved matches:
+- **NRG Building:** an unrelated similarly named builder's domain is not evidence. Do not map to Rockcote solely because the source image filename says Rockcote.
+- **Ezycoat:** the similarly named pet-grooming domain is unrelated. The building-materials brand is linked through the official Ezycoat redirect to Active Building Systems.
+- **BASF / Master Builders Solutions:** old corporate relationships and product renames were not accepted from unverified research. Legacy products remain unmapped until exact manufacturer documentation is checked.
+- **Mapei / Marshalltown:** automated source requests encountered access restrictions; they were not bypassed and not counted among the verified supplier resources.
+- **BESS2021:** no source manufacturer; a filename does not establish ABG, Boral, Lutum or another supplier.
+- **PROMAC SDS MAX crosshead:** source description says SDS Plus while the title says MAX. The conflict is prominently flagged. Dimensions/labels are retained exactly; no speculative corrections.
+- **SGE626:** source title says 600mm but description says 626mm; caveat retained.
+- **Lanotec heavy duty:** actual source SKU now verified as LUBR144; older saved cart ID stays compatible while generated quote references use the true SKU.
+- **PolyGlow:** six distinct colour codes now available. The old generic preview item is removed with a saved-cart warning; no colour is silently assigned.
+
+## Images and rights
+
+2,063 original listing images are downloaded and self-hosted, with original URLs retained. They are not certified as new/current manufacturer pack shots. All rights remain with Lyndons and the relevant owners; obtain approval before broader commercial use. No arbitrary web photo was substituted for an unknown product. Missing photos have a visible fallback.
+
+## Completing what is not public
+
+Request the approved ERP/POS product export with SKU, supplier code, barcode, units/pack conversion, variant, discontinued status and branch range. Match each supplier code to a current manufacturer product page, approved photo and TDS/SDS. Review the missing-brand/photo/description queue with branch staff. Do not publish private prices or treat a supplier catalogue as Lyndons inventory. The current collection is source material, not a guarantee of current availability or suitability.

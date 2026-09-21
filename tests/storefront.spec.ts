@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { safeCart, quoteText, emptyDetails } from '../src/lib/quote';
+import { products } from '../src/data/catalog';
 
 async function unlock(page: Page) {
   await page.goto('./');
@@ -21,9 +22,9 @@ test('password rejects invalid input, unlocks, and locks again', async ({ page }
   await expect(page.getByRole('alert')).toContainText('isn’t right');
   await page.getByLabel('Preview password', { exact: true }).fill('Whitaker');
   await page.getByRole('button', { name: 'Explore the website' }).click();
-  await expect(page.locator('.product-card')).toHaveCount(14);
+  await expect(page.locator('.product-card')).toHaveCount(24);
   await page.reload();
-  await expect(page.locator('.product-card')).toHaveCount(14);
+  await expect(page.locator('.product-card')).toHaveCount(24);
   await page.getByRole('button', { name: 'Lock preview' }).click();
   await expect(page.getByLabel('Preview password', { exact: true })).toBeVisible();
 });
@@ -40,11 +41,11 @@ test('search, category, brand, empty state and product dialog work', async ({ pa
   await expect(page.getByRole('heading', { name: 'No products found' })).toBeVisible();
   await page.getByRole('button', { name: 'Clear filters', exact: true }).first().click();
   await page.locator('.category-tiles').getByRole('button', { name: 'Masonry', exact: true }).click();
-  await expect(page.locator('.product-card')).toHaveCount(1);
+  await expect(page.locator('.product-card')).toHaveCount(Math.min(24, products.filter(p => p.category === 'Masonry').length));
   await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
-  await page.getByLabel('Filter by brand').selectOption('Topcon');
-  await expect(page.locator('.product-card')).toHaveCount(1);
-  await expect(page.locator('.product-card')).toContainText('RL-H5A');
+  await page.getByLabel('Filter by brand').selectOption('TOPCON');
+  await expect(page.locator('.product-card')).toHaveCount(products.filter(p => p.brand.toLowerCase() === 'topcon').length);
+  await expect(page.locator('.product-card').first()).toContainText('RL-H5A');
 });
 test('cart persists, supports quantities and removal', async ({ page }) => {
   await startQuote(page);
@@ -120,7 +121,8 @@ test('contact draft survives browsing but is not stored and clears on reload', a
   await expect(page.getByLabel('Your name *', { exact: true })).toHaveValue('');
 });
 test('unavailable product photos have an honest visible fallback', async ({ page }) => {
-  await page.route('**/cmnt039.webp', route => route.abort());
+  const imagePath = new URL(products[0].image, 'http://localhost').pathname;
+  await page.route(`**${imagePath}`, route => route.abort());
   await unlock(page);
   await page.getByRole('button', { name: 'View OneMix Concrete Mix', exact: true }).scrollIntoViewIfNeeded();
   await expect(page.locator('.product-card').first().getByText('Photo unavailable')).toBeVisible();

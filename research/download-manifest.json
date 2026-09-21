@@ -1,0 +1,35 @@
+{
+  "checkedAt": "2026-09-21T11:43:27.849Z",
+  "files": [
+    {
+      "file": "public/catalogues/lyndons-product-catalogue-november-2022.pdf",
+      "source": "https://lyndons.com.au/asset/download/914/d718a2/lyndons-catalogue-nov-22-final.pdf",
+      "pages": 4,
+      "classification": "Expired promotional offers flyer, November 2022; NOT a full-range catalogue or current price list",
+      "bytes": 1696751,
+      "sha256": "874aba9e7f8525f1c840c3c51ead173f809bc577b5f35776968a4d71ce591601"
+    },
+    {
+      "file": "public/catalogues/lyndons-capability-statement.pdf",
+      "source": "https://lyndons.com.au/asset/download/968/ef5a9a/lyndons-capability-statement-compressed.pdf",
+      "pages": 20,
+      "classification": "Company capability statement; not product inventory; publication date unverified",
+      "bytes": 4964928,
+      "sha256": "a275914ea74dae98bac403fc8a3a0d05c4c4acd05c0fb9fabe5e7db0fb55ca9c"
+    },
+    {
+      "file": "public/catalogues/flextool-product-catalogue-v33.pdf",
+      "source": "https://www.flextool.com.au/media/efmn05pp/flextool-product-catalogue-v33-spread.pdf",
+      "classification": "Supplier catalogue version 33; not proof of Lyndons stock",
+      "bytes": 28474514,
+      "sha256": "500719e57464157b5bd7be798c70f21ae5e91b21e2c0f6afa4ced94161b51979"
+    }
+  ],
+  "unavailable": [
+    {
+      "source": "https://rapidtool.com.au/wp-content/uploads/2026/07/RAPIDTOOL-Catalogue-6.pdf",
+      "status": 403,
+      "action": "Not downloaded; access restriction respected. Official catalogue landing page remains accessible."
+    }
+  ]
+}

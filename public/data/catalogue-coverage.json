@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-09-21T11:11:00.340Z",
+  "discoveredPages": 2061,
+  "attemptedPages": 2061,
+  "importedPages": 2061,
+  "variantRows": 3853,
+  "withDescriptions": 1889,
+  "withPhotos": 1967,
+  "downloadedPhotoReferences": 2134,
+  "uniqueDownloadedPhotos": 2063,
+  "missingBrands": 562,
+  "failedPhotos": 0,
+  "manufacturerVerifiedProducts": 0,
+  "stopped": false,
+  "scope": "Public product sitemaps only, not the full stocked inventory. Brands are retailer attribution, not independently verified manufacturers.",
+  "supplierResources": 28,
+  "productsWithSupplierResource": 976,
+  "supplierCoverageNote": "Brand-level resource matches only; not individual product/manufacturer verification.",
+  "downloadedPdfs": [
+    {
+      "name": "Lyndons November 2022 offers flyer",
+      "pages": 4,
+      "file": "catalogues/lyndons-product-catalogue-november-2022.pdf",
+      "warning": "Expired promotional prices; not a full-range catalogue."
+    },
+    {
+      "name": "Lyndons capability statement",
+      "pages": 20,
+      "file": "catalogues/lyndons-capability-statement.pdf",
+      "warning": "Company overview, not product inventory."
+    }
+  ]
+}

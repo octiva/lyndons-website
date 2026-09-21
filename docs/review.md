@@ -1,5 +1,19 @@
 # Builder → reviewer → judge
 
+## Catalogue expansion pass — 21 September 2026
+
+Parallel research covered catalogue discovery, tools, chemicals/materials and hardware/safety supplier resources. A reproducible collector processed all 2,061 public sitemap listings into 3,853 product/variant rows and downloaded 2,063 unique images. Exact manufacturer matching is incomplete and is not claimed.
+
+Opening the actual four-page November 2022 PDF corrected the earlier mistaken assumption that it was a broad product catalogue: it is an expired promotional flyer. Site labels, README and research documentation now make this explicit. Two further PDFs were downloaded (20-page capability statement and Flextool v33 catalogue); the RAPIDTOOL PDF denied access and was not bypassed.
+
+Builder changes: all-category selector, 24-item pagination, deferred catalogue loading until unlock, source provenance, local product photos and downloadable CSV. SKU-based reconciliation preserves moved Sika listings and all six PolyGlow colours. The old generic PolyGlow basket item is removed with a warning rather than arbitrarily choosing a colour.
+
+Independent read-only reviewer and judge found no preview-release blockers. Their output was checked against executable evidence: **3 extractor tests and 22 desktop/mobile Playwright cases passed**, TypeScript build and Oxlint passed, production audit reported zero vulnerabilities. Browser visual review confirmed mobile imported-variant search, photo and caution label.
+
+The complete catalogue is approximately 469KB gzipped and deferred until unlock. Vite reports a large-chunk advisory (approximately 3.8MB uncompressed); pagination limits rendered cards, not the dataset size. For slower networks or further growth, replace the static data with server-side search/paginated API. This is documented rather than hidden by changing the warning threshold.
+
+The earlier sections below describe the original 14-product preview and its first deployment, not the current catalogue coverage.
+
 ## Builder pass
 
 Built around find → add → review → share, rather than retail payment checkout. Five broad product categories, photo-led cards, plain labels, direct branch calls, no account requirement and a mobile bottom navigation. Burgundy/gold palette retains the existing Lyndons logo. Sourced 14 records and a broader archived catalogue.

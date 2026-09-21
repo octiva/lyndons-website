@@ -12,6 +12,10 @@ test-results
 playwright-report
 .env
 .env.*
+research/catalogue/records/
+research/catalogue/images/
+research/catalogue/products.json
+research/catalogue/products.csv
 dist
 dist-ssr
 *.local

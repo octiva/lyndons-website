@@ -1,4 +1,5 @@
-export type Category = 'Concrete & cement' | 'Tools & equipment' | 'Sealants & chemicals' | 'Render & finishes' | 'Masonry';
+import importedProducts from './generated/products.json' with { type: 'json' };
+export type Category = string;
 export interface Product {
   id: string;
   name: string;
@@ -12,6 +13,9 @@ export interface Product {
   supplier?: string;
   note?: string;
   verified: string;
+  imported?: boolean;
+  sourceSku?: string;
+  imageSource?: string;
 }
 const source = 'https://lyndons.com.au/products/';
 const photo = 'https://lyndons.com.au/media/cache/435x435_webp/';
@@ -33,13 +37,28 @@ const seeds: Seed[] = [
   { id: 'NRG14547', name: 'Medium Sand Acrylic Texture', brand: 'NRG Building', manufacturer: 'NRG Building (listed brand; current packaging to confirm)', category: 'Render & finishes', pack: '15L · light base', description: 'Medium-sand acrylic texture listed for NRG reinforced render and texture-coating systems. Confirm the base, colour and system compatibility with the branch.', image: photo+'0/7/1737/wn4A629bEDYJvs3R/rockcote-acrylic-texture-medium-deep-base-15-l.webp', source: source+'rendering-products-equipment-textures-acrylic-render/nrg-sand-medium-lb-15-litre-acrylic-texture', note: 'Lyndons lists NRG but the supplied image filename refers to Rockcote. Packaging and manufacturer need confirmation.' },
   { id: 'POLYGLOW-1KG', name: 'PolyGlow Decorative Stones', brand: 'Schneppa Glass', manufacturer: 'Schneppa Glass (supplier / brand)', category: 'Render & finishes', pack: '1kg bag · 5–15mm', description: 'Glow-in-the-dark decorative aggregate for concrete finishes and landscaping. Discuss the proposed application with the branch and follow the supplier’s installation guidance.', image: photo+'2/9/2759/XTmATfVEhKNCoYqn/polyglow-stones.webp', source: source+'concreting-products-cement-and-accessories-decorative-and-colouring/polyglow-stones-5-15mm-1kg-bag', supplier: 'https://schnepparecycledcrushedglass.com.au/', note: 'Preview reference only: confirm the supplier ordering code with the branch.' },
 ];
-export const products: Product[] = seeds.map(p => ({ ...p, verified: '2026-09-21' }));
-export const categories: Category[] = ['Concrete & cement', 'Tools & equipment', 'Sealants & chemicals', 'Render & finishes', 'Masonry'];
+const base = import.meta.env?.BASE_URL ?? '/lyndons-website/';
+// Keep the hand-reviewed names/descriptions and legacy cart IDs; use the collected real SKU/photo.
+// Never silently choose a size/colour for an old generic product (e.g. PolyGlow).
+const featured: Product[] = seeds.flatMap(p => {
+  const sameSource = importedProducts.filter(item => item.source === p.source);
+  const match = importedProducts.find(item => item.id === p.id) ?? (sameSource.length === 1 ? sameSource[0] : undefined);
+  if (!match) return [];
+  return [{ ...p, source: match.source, image: match.image ? base + match.image : p.image, sourceSku: match.id, imageSource: match.imageSource || p.image, verified: '2026-09-21' }];
+});
+const replacedIds = new Set(featured.map(p => p.sourceSku));
+export const products: Product[] = [...featured, ...importedProducts.filter(p => !replacedIds.has(p.id)).map(p => ({ ...p, image: p.image ? base + p.image : '', sourceSku: p.id }))];
+export const categories: Category[] = ['Concrete & cement', 'Tools & equipment', 'Sealants & chemicals', 'Render & finishes', 'Masonry', ...[...new Set(products.map(p => p.category))].filter(c => !['Concrete & cement', 'Tools & equipment', 'Sealants & chemicals', 'Render & finishes', 'Masonry'].includes(c)).sort()];
 export const catalogues = [
-  { title: 'Lyndons product catalogue', subtitle: 'November 2022 · archived PDF', description: 'A broader look at the range. Products, packaging and availability may have changed.', url: 'https://lyndons.com.au/asset/download/914/d718a2/lyndons-catalogue-nov-22-final.pdf', tag: 'FULL-RANGE REFERENCE' },
+  { title: 'Lyndons online product list', subtitle: '3,853 product / variant rows · CSV', description: 'Download the collected public range with descriptions, codes, photo sources and supplier references. Not a complete stocked inventory.', url: base + 'data/lyndons-public-product-list.csv', tag: 'COLLECTED ONLINE RANGE' },
+  { title: 'Lyndons archived offers', subtitle: 'November 2022 · 4-page PDF', description: 'Downloaded original. An expired promotional flyer, not the complete range. Its prices are not current.', url: base + 'catalogues/lyndons-product-catalogue-november-2022.pdf', tag: 'HISTORICAL · EXPIRED OFFERS' },
+  { title: 'Lyndons capability statement', subtitle: '20-page PDF · company overview', description: 'Downloaded company and capability information. Not a current product or stock catalogue.', url: base + 'catalogues/lyndons-capability-statement.pdf', tag: 'ABOUT LYNDONS' },
+  { title: 'Flextool product catalogue', subtitle: 'Version 33 · downloaded PDF', description: 'Supplier equipment catalogue. A supplier listing does not confirm Lyndons stock or availability.', url: base + 'catalogues/flextool-product-catalogue-v33.pdf', tag: 'TOOLS & EQUIPMENT' },
+  { title: 'OX Tools catalogues', subtitle: 'Official Australian catalogue library', description: 'Current hand tools and accessories catalogues direct from OX Tools.', url: 'https://www.oxtools.com.au/catalogues/', tag: 'SUPPLIER CATALOGUES' },
   { title: 'MasterFinish & A.G. Pulie', subtitle: 'Supplier download library', description: 'Tool and equipment catalogues direct from the supplier.', url: 'https://www.agpulie.com.au/DOWNLOADS', tag: 'TOOLS & EQUIPMENT' },
   { title: 'CCS technical library', subtitle: 'Data sheets & application guides', description: 'Manufacturer guidance for concrete finishes, sealers and coatings.', url: 'https://concretecoloursystems.com.au/data-sheets-guidelines', tag: 'CONCRETE FINISHES' },
   { title: 'Sunstate product data', subtitle: 'Manufacturer technical library', description: 'Technical information for Sunstate cement products.', url: 'https://sunstatecement.com.au/publications/product-data/', tag: 'CEMENT & CONCRETE' },
+  { title: 'Catalogue coverage & sources', subtitle: 'Download the collection report · JSON', description: 'See exactly what was collected, missing descriptions/photos and supplier-source coverage.', url: base + 'data/catalogue-coverage.json', tag: 'SOURCE TRANSPARENCY' },
 ];
 export const branches = [
   ['Windsor', 'lyndons-windsor', '07 3857 7788'], ['Burleigh', 'lyndons-burleigh', '07 5593 5050'], ['Caboolture', 'caboolture', '07 5208 8500'], ['Cairns', 'lyndons-cairns', '07 4053 4000'], ['Gladstone', 'lyndons-gladstone', '07 4972 1691'], ['Ipswich', 'ipswich', '07 3159 3222'], ['Mackay', 'lyndons-mackay', '07 4952 5667'], ['Maroochydore', 'lyndons-maroochydore', '07 5452 0222'], ['Rockhampton', 'lyndons-rockhampton', '07 4922 2832'], ['Salisbury', 'lyndons-salisbury', '07 3274 4199'], ['Southport', 'southport', '07 5654 5900'], ['Townsville', 'lyndons-townsville', '07 4774 7877'],
