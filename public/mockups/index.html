@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#800020">
+  <title>Lyndons — design concepts</title>
+  <link rel="icon" href="../site-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main id="gate" class="gate">
+    <img src="../images/logo.svg" alt="Lyndons" width="220" height="49">
+    <span class="gate-kicker">DESIGN REVIEW / SEPTEMBER 2026</span>
+    <h1>A different direction.</h1>
+    <p>Two practical storefront concepts. Separate pages for products, catalogues and your quote.</p>
+    <form id="unlock-form">
+      <label for="password">Preview password</label>
+      <input type="password" id="password" autocomplete="current-password" required>
+      <p id="gate-error" class="error" role="alert"></p>
+      <button class="primary" type="submit">View the concepts <span aria-hidden="true">→</span></button>
+    </form>
+    <small>This is a visual prototype, not the live ordering site. This client-side password screen is not secure access control.</small>
+  </main>
+  <div id="prototype" hidden>
+    <a class="skip" href="#content">Skip to page content</a>
+    <aside class="review-bar" aria-label="Design review controls">
+      <div><strong>LYNDONS / DESIGN STUDY</strong><span class="review-note">Interactive mockups · sample products · nothing is sent</span></div>
+      <div class="concept-switch" role="group" aria-label="Design direction">
+        <button type="button" data-concept="counter" aria-pressed="true">A <span>Trade Counter</span></button>
+        <button type="button" data-concept="desk" aria-pressed="false">B <span>Supply Desk</span></button>
+      </div>
+    </aside>
+    <div id="site" class="counter">
+      <div class="service-bar"><div class="wrap"><span>Building & construction supplies</span><a href="#/branches">12 Queensland branches <span aria-hidden="true">↗</span></a></div></div>
+      <header>
+        <div class="wrap masthead">
+          <a href="#/home" aria-label="Lyndons home"><img class="logo" src="../images/logo.svg" alt="Lyndons" width="205" height="45"></a>
+          <form id="search-form" class="search" role="search"><label class="sr-only" for="search">Search products or product codes</label><input id="search" type="search" placeholder="Search products or enter a product code" autocomplete="off"><button type="submit" aria-label="Search products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button></form>
+          <a href="#/branches" class="branch-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 10c0 5-7 12-7 12S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span><small>Your branch</small><strong id="branch-name">Windsor</strong></span></a>
+          <a href="#/quote" class="quote-link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H5v18h14V4h-3M8 2h8v5H8zM8 12h8M8 16h6"/></svg><span>Your quote</span><b id="quote-count">0</b></a>
+          <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation">Menu <span aria-hidden="true">☰</span></button>
+        </div>
+        <nav id="navigation" aria-label="Main navigation"><div class="wrap nav-inner"><a href="#/products" data-nav="products"><span aria-hidden="true">☰</span> Products</a><a href="#/brands" data-nav="brands">Brands</a><a href="#/catalogues" data-nav="catalogues">Catalogues & data sheets</a><a href="#/branches" data-nav="branches">Branches</a><a href="#/help" data-nav="help">Delivery & help</a><a class="nav-call" href="tel:0738577788">07 3857 7788</a></div></nav>
+      </header>
+      <main id="content" tabindex="-1"></main>
+      <footer><div class="wrap footer-inner"><div><img src="../images/logo.svg" alt="Lyndons" width="132" height="29"><span>Building & construction supplies</span></div><nav aria-label="Footer navigation"><a href="#/branches">Contact a branch</a><a href="#/help">Help with a quote</a><a href="../" target="_blank" rel="noreferrer">Existing preview ↗</a></nav></div><div class="wrap footer-fine"><span>Design concept only. Prices and availability are confirmed by the branch.</span><button type="button" id="lock">Lock mockups</button></div></footer>
+    </div>
+    <div id="notice" class="toast" role="status" aria-live="polite"></div>
+  </div>
+  <noscript>JavaScript is needed for these interactive design concepts.</noscript>
+</body>
+</html>
