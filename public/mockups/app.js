@@ -42,7 +42,7 @@ function breadcrumbs(items) { return `<nav class="breadcrumbs" aria-label="Bread
 function home() {
   if (concept === 'desk') return `<div class="wrap desk-home"><div class="page-heading"><div><p class="section-label">LYNDONS TRADE SUPPLIES</p><h1>What’s on your list?</h1><p>Find a product, enter a code, or start a quote.</p></div>${link('products', 'Browse products →', 'primary')}</div><div class="desk-start"><section><h2>Quick add to quote</h2><p>Know the code? Start here.</p>${quickForm()}<small>Try CMNT039 or SIKA212. Sample catalogue only.</small></section><aside><span class="section-label">YOUR BRANCH</span><h2>Lyndons ${branch}</h2><p>For product advice, pricing and delivery enquiries.</p><a href="tel:${branch === 'Windsor' ? '0738577788' : '0740534000'}">${branch === 'Windsor' ? '07 3857 7788' : '07 4053 4000'}</a>${link('branches', 'Branch details →')}</aside></div><div class="desk-index"><section><h2>Product directory</h2>${categoryImages.map(([name,,desc], i) => link('products', `<span class="index-number">0${i + 1}</span><span><strong>${name}</strong><small>${desc}</small></span><span aria-hidden="true">→</span>`, 'directory-row', {category:name})).join('')}</section><section><h2>Sample product list</h2>${data.slice(0,4).map(p => `<div class="mini-row"><img src="${image(p)}" alt="" width="55" height="55"><span>${link(`product/${p.id}`, escape(p.name))}<small>${p.id} · ${p.pack}</small></span><button data-add="${p.id}" aria-label="Add ${escape(p.name)}">Add +</button></div>`).join('')}<p class="subtle">Example only—not a personalised list or sales ranking.</p></section></div></div>`;
   return `<div class="wrap home search-first">
-    <section class="landing-search" aria-labelledby="landing-title"><div><h1 id="landing-title">Find your building supplies.</h1><p>Search by product, brand or code. We’ll help with the spelling.</p></div><form id="landing-search-form" role="search" aria-label="Homepage product search"><label class="sr-only" for="landing-search">Find a product</label><input id="landing-search" type="search" placeholder="Try concrete mix, grout or CMNT039" autocomplete="off" maxlength="120" aria-controls="home-products"><button class="primary" type="submit">Search products <span aria-hidden="true">→</span></button></form><small>Interactive sample: 8 real products. The complete range remains in the existing preview.</small></section>
+    <section class="landing-intro" aria-labelledby="landing-title"><h1 id="landing-title">Find your building supplies.</h1><p>Use the search above to find products, brands or codes.</p><small>Interactive sample: 8 real products. The complete range remains in the existing preview.</small></section>
     <section class="updates" aria-label="Updates and useful information" aria-roledescription="carousel">
       <div class="updates-top"><strong>Updates & useful information</strong><span>Example editorial panels · not company news</span></div>
       <div class="updates-panels">
@@ -98,7 +98,6 @@ function render() {
   if (section === 'home' && concept === 'counter') {
     disposeUpdates = mountUpdates($('.updates'));
     updateHomeResults(params.get('q') || '');
-    $('#landing-search').value = params.get('q') || '';
   }
   if (section === 'products' && searchProducts(data, params.get('q') || '').approximate) {
     $('.results').insertAdjacentHTML('afterbegin', '<p class="notice-box">Close matches shown. Check the product name and code before adding.</p>');
@@ -138,7 +137,6 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('submit',e=>{
   const form=e.target;
-  if(form.id==='landing-search-form') {e.preventDefault();updateHomeResults($('#landing-search').value);$('#home-products-heading').setAttribute('tabindex','-1');$('#home-products-heading').focus();$('#home-products').scrollIntoView({behavior:'auto'});}
   if(form.id==='product-add') {e.preventDefault();add(form.dataset.id,Number(new FormData(form).get('quantity')));}
   if(form.id==='filters') {e.preventDefault();const {params}=current();const fields=new FormData(form);for(const key of ['brand','type']){if(fields.get(key))params.set(key,fields.get(key));else params.delete(key);}location.hash=`#/products?${params}`;render();}
   if(form.classList.contains('quick-form')) {e.preventDefault();const fields=new FormData(form);const id=String(fields.get('code')).trim().toUpperCase();const p=data.find(p=>p.id===id);form.querySelector('.quick-error').textContent=p?'':'Code not in this sample. Try CMNT039 or browse the sample range.';if(p)add(id,Number(fields.get('quantity')));}
@@ -157,14 +155,12 @@ function updateHomeResults(query) {
   $('#home-product-grid').innerHTML = result.items.length ? result.items.map(card).join('') : '<div class="empty"><h3>No matching sample products</h3><p>Try “concrete”, “grout” or a product code. Only eight examples are included.</p><button type="button" data-reset-search>Show all sample products</button></div>';
 }
 document.addEventListener('input',event=>{
-  if (!['landing-search','search'].includes(event.target.id)) return;
+  if (event.target.id !== 'search') return;
   if (current().path === 'home' && concept === 'counter') {
     const value = event.target.value;
-    const other = event.target.id === 'search' ? $('#landing-search') : $('#search');
-    if (other) other.value = value;
     updateHomeResults(value);
   }
 });
 document.addEventListener('click',event=>{
-  if(event.target.closest('[data-reset-search]')) {$('#landing-search').value='';$('#search').value='';updateHomeResults('');$('#landing-search').focus();}
+  if(event.target.closest('[data-reset-search]')) {$('#search').value='';updateHomeResults('');$('#search').focus();}
 });

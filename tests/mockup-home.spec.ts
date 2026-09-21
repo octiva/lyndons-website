@@ -7,22 +7,26 @@ test.beforeEach(async ({ page }) => {
   await page.getByLabel('Preview password', { exact: true }).fill('Whitaker');
   await page.getByRole('button', { name: 'View the concepts' }).click();
 });
-test('homepage order is search then updates then product tiles; fuzzy matches never add automatically', async ({ page }) => {
+test('only banner search remains; fuzzy matches update homepage tiles without adding automatically', async ({ page }) => {
+  await expect(page.getByRole('search')).toHaveCount(1);
+  await expect(page.locator('input[type="search"]')).toHaveCount(1);
+  await expect(page.locator('#content form[role="search"]')).toHaveCount(0);
   await expect(page.locator('.search-first > section')).toHaveCount(3);
-  await expect(page.locator('.search-first > section').nth(0)).toHaveClass('landing-search');
+  await expect(page.locator('.search-first > section').nth(0)).toHaveClass('landing-intro');
   await expect(page.locator('.search-first > section').nth(1)).toHaveClass('updates');
   await expect(page.locator('#home-product-grid .product-card')).toHaveCount(8);
-  await page.getByLabel('Find a product', { exact: true }).fill('concreet mix');
+  await page.getByLabel('Search products or product codes').fill('concreet mix');
   await expect(page.locator('#home-product-grid .product-card')).toHaveCount(2);
   await expect(page.locator('#home-match-note')).toContainText('Close matches');
   await expect(page.locator('#quote-count')).toHaveText('0');
-  await page.getByLabel('Find a product', { exact: true }).fill('SIKA212');
+  await page.getByLabel('Search products or product codes').fill('SIKA212');
   await expect(page.locator('#home-product-grid .product-card')).toHaveCount(1);
   await expect(page.locator('#home-product-grid')).toContainText('SikaGrout');
-  await page.getByLabel('Find a product', { exact: true }).fill('zzzzzzzz');
+  await page.getByLabel('Search products or product codes').fill('zzzzzzzz');
   await expect(page.getByRole('heading', { name: 'No matching sample products' })).toBeVisible();
   await page.getByRole('button', { name: 'Show all sample products' }).click();
   await expect(page.locator('#home-product-grid .product-card')).toHaveCount(8);
+  await expect(page.getByLabel('Search products or product codes')).toBeFocused();
 });
 test('updates rotate, pause on interaction, and respect reduced motion', async ({ page }) => {
   await page.mouse.move(0, 0);
@@ -47,8 +51,8 @@ test('each update is accessible and homepage search works from the header', asyn
     expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([]);
   }
   await page.getByLabel('Search products or product codes').fill('concret mix');
-  await expect(page.getByLabel('Find a product', { exact: true })).toHaveValue('concret mix');
-  await page.getByRole('button', { name: 'Search products', exact: true }).first().click();
+  await expect(page.locator('#home-product-grid .product-card')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Search products', exact: true }).click();
   await expect(page).toHaveURL(/#\/products\?q=concret\+mix/);
   await expect(page.locator('.product-card')).toHaveCount(2);
 });

@@ -6,7 +6,7 @@ Direct concept links: `mockups/?concept=counter#/home` and `mockups/?concept=des
 
 ## Directions
 
-- **A — Trade Counter (revised 22 September):** prominent fuzzy search, rotating editorial panels, then the full eight-product sample tile view on Home. Traditional maroon navigation and dedicated product/document/quote pages remain.
+- **A — Trade Counter (revised 22 September):** one fuzzy search in the banner (no duplicate in-page search), rotating editorial panels, then the full eight-product sample tile view on Home. Banner typing filters the homepage tiles; submitting opens the product results page. Traditional maroon navigation and dedicated product/document/quote pages remain.
 - **B — Supply Desk:** compact directory homepage, exact-code quick add, neutral navigation and dense product rows. Switch direction in the review bar on any page to compare the same content.
 
 Both directions have responsive Home, Products, Product, Brands, Catalogues, Branches, Help and Quote views. Hash routes are distinct page views, not anchors in one long homepage. Browser Back/Forward works for route/filter changes. The mockup does not promise production-level scroll restoration.
