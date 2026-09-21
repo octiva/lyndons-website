@@ -40,6 +40,10 @@ Playwright covers desktop Chromium and mobile Chromium emulation. Core suite pas
 - Browser visual checks on desktop and mobile.
 - Every published supplier/resource link and all 14 photo URLs returned HTTP 200 in the source audit.
 
+## Deployment verification
+
+[GitHub Actions run 35586764040](https://github.com/octiva/lyndons-website/actions/runs/35586764040) completed successfully, including the independent Linux build/test job and Pages deployment. The [live site](https://octiva.github.io/lyndons-website/) was checked in the browser: correct password unlocks, all 14 photos decode, the quote review opens, Maroochydore routes to the verified `maroochy@lyndons.com.au` address, and dummy contact data is absent from localStorage. No test email was sent.
+
 ## Production gate (not yet passed)
 
 Approved current SKU export, manufacturer/packaging reconciliation, image permissions, full catalogue import, real quote API with delivery confirmation, CRM assignment, real customer identity/pricing and manual testing with builders and branch staff. Password screen remains explicitly non-secure on public Pages.

@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Preview Lyndons website",
+			"type": "shell",
+			"command": "source \"$HOME/.nvm/nvm.sh\" && nvm use 22 && npm run preview -- --host 127.0.0.1 --port 4319 --strictPort",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}
