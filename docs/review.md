@@ -14,6 +14,10 @@ The complete catalogue is approximately 469KB gzipped and deferred until unlock.
 
 The earlier sections below describe the original 14-product preview and its first deployment, not the current catalogue coverage.
 
+### Expanded release verification
+
+[Workflow 35596388696](https://github.com/octiva/lyndons-website/actions/runs/35596388696) successfully built, tested and deployed commit `3a8ef00`. Live browser verification shows 3,853 results, 24 cards per page, all 18 category choices and the nine resource cards. Live HTTP checks returned 200 with correct content types for the coverage JSON, product CSV, all three downloaded PDFs and a self-hosted product photo. The coverage JSON reports 2,061 pages / 3,853 rows / 2,063 unique photos.
+
 ## Builder pass
 
 Built around find → add → review → share, rather than retail payment checkout. Five broad product categories, photo-led cards, plain labels, direct branch calls, no account requirement and a mobile bottom navigation. Burgundy/gold palette retains the existing Lyndons logo. Sourced 14 records and a broader archived catalogue.

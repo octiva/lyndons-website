@@ -8,6 +8,6 @@
 - [x] Create and run preview task on port 4319.
 - [x] Launch and review desktop/mobile; independent reviewer and judge pass documented.
 - [x] Complete documentation: source provenance, CRM recommendation, integration roadmap and review record.
-- [x] Publish to GitHub Pages and verify: https://octiva.github.io/lyndons-website/; workflow 35586764040 succeeded. Live password, all 14 photos and Maroochydore quote draft checked without sending email.
+- [x] Publish expanded catalogue to https://octiva.github.io/lyndons-website/; workflow 35596388696 succeeded. Live 3,853 result count, pagination/category controls, CSV/PDF downloads and local product photo verified. No test email sent.
 
 Use Node 22. Product claims need source URLs; never invent stock, prices or manufacturer identities. Keep customer details out of localStorage and the repository. The client-side preview gate is not security. Quote preparation must never imply a request was sent. No payment integrations. Keep customer pricing behind a future authenticated server API.
