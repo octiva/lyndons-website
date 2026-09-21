@@ -17,5 +17,9 @@ class CatalogueBoundary extends Component<{ children: ReactNode }, { failed: boo
 export default function PreviewApp() {
   const [unlocked, setUnlocked] = useState(sessionOpen);
   if (!unlocked) return <PreviewGate onUnlock={() => setUnlocked(true)} />;
-  return <CatalogueBoundary><Suspense fallback={<main className="container empty-quote" aria-busy="true"><h1>Loading your supplies…</h1><p role="status">Opening the product catalogue.</p></main>}><Storefront /></Suspense></CatalogueBoundary>;
+  function lock() {
+    try { sessionStorage.removeItem('lyndons-preview'); } catch { /* Memory-only preview access. */ }
+    setUnlocked(false);
+  }
+  return <CatalogueBoundary><Suspense fallback={<main className="container empty-quote" aria-busy="true"><h1>Loading your supplies…</h1><p role="status">Opening the product catalogue.</p></main>}><Storefront onLock={lock} /></Suspense></CatalogueBoundary>;
 }

@@ -45,7 +45,9 @@ The collector checks the public robots policy, discovers 21 product sitemaps, us
 
 DOM extraction preserves the visible title, listed brand, description, breadcrumbs, gallery photo sources, variant labels and their exact product references. Generic placeholders are excluded from product photos. Missing data is flagged rather than guessed. The source's concatenated invalid Product JSON for variants is not trusted; variant dropdown IDs are matched against their labelled SKU elements.
 
-`npm run catalogue:collect` resumes from per-page records and existing photos. `npm run catalogue:prepare` verifies supplier resources, publishes local photos and prepares the application dataset. `node scripts/catalogue-manifest.mjs` validates PDFs and exports the public spreadsheet. Delete a specific cached record to refresh it; otherwise its original checked timestamp remains intact.
+`npm run catalogue:collect` resumes from per-page records and existing photos. Records refresh when their sitemap modification value changes or a seven-day TTL expires, or with `-- --refresh`; `CATALOGUE_TTL_DAYS` configures the TTL. Failed refreshes retain the old record and are reported explicitly. Limited, incomplete and stopped collections do not overwrite the last complete product JSON/CSV/report. The separate attempt report records these outcomes. The refresh/publication policy is tested offline; this iteration did not recrawl all source pages.
+
+`npm run catalogue:prepare` verifies supplier resources, publishes local photos and prepares both the full review dataset and losslessly compacted runtime dataset. It retains family identity, exact variant labels and source category hierarchy. `node scripts/catalogue-manifest.mjs` validates PDFs and exports the public spreadsheet. Ordering units still require verified source/business data; bag weights and colour labels are not converted into assumed purchasing units.
 
 ## Manufacturer and description confidence
 

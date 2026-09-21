@@ -1,4 +1,4 @@
-import importedProducts from './generated/products.json' with { type: 'json' };
+import compact from './generated/catalogue-compact.json' with { type: 'json' };
 export type Category = string;
 export interface Product {
   id: string;
@@ -16,11 +16,21 @@ export interface Product {
   imported?: boolean;
   sourceSku?: string;
   imageSource?: string;
+  familyId: string;
+  familyName: string;
+  variantLabel: string;
+  categoryPath: string[];
+  subcategory: string;
 }
+// Lossless table expansion keeps repeated descriptions, categories and URLs out of the bundle.
+const importedProducts = compact.rows.map(row => Object.fromEntries(compact.fields.map((field, i) => {
+  const value = row[i];
+  return [field, typeof value === 'number' ? compact.strings[value] : Array.isArray(value) ? value.map(index => compact.strings[index]) : value];
+}).filter(([, value]) => value !== null))) as Product[];
 const source = 'https://lyndons.com.au/products/';
 const photo = 'https://lyndons.com.au/media/cache/435x435_webp/';
 const cement = 'concreting-products-cement-accessories-cement-bagged-pre-blended/';
-type Seed = Omit<Product, 'verified'>;
+type Seed = Omit<Product, 'verified' | 'familyId' | 'familyName' | 'variantLabel' | 'categoryPath' | 'subcategory'>;
 const seeds: Seed[] = [
   { id: 'CMNT039', name: 'OneMix Concrete Mix', brand: 'Sunstate Cement', manufacturer: 'Sunstate Cement / OneMix', category: 'Concrete & cement', pack: '20kg bag', description: 'A ready-blended mix of cement, sand and aggregate for general concreting and smaller jobs. Follow the bag instructions for mixing and placement.', image: photo+'0/2/2022/yRTvpsOjVb2kELB7/cmnt039.webp', source: source+cement+'concrete-mix-20kg-bag', supplier: 'https://sunstatecement.com.au/our-products/' },
   { id: 'SIKA212', name: 'SikaGrout®-212 HP', brand: 'Sika', manufacturer: 'Sika Australia', category: 'Concrete & cement', pack: '20kg bag', description: 'High-performance, non-shrink cementitious grout. Two-stage expansion compensates for shrinkage in both the plastic and hardened states. Check the current technical data before use.', image: photo+'2/0/2030/vKhZl2Sll9bL4Qky/sika212.webp', source: source+cement+'sikagrout-212hp-20kg-bag-flowable-411020', supplier: 'https://aus.sika.com/' },
@@ -44,10 +54,16 @@ const featured: Product[] = seeds.flatMap(p => {
   const sameSource = importedProducts.filter(item => item.source === p.source);
   const match = importedProducts.find(item => item.id === p.id) ?? (sameSource.length === 1 ? sameSource[0] : undefined);
   if (!match) return [];
-  return [{ ...p, source: match.source, image: match.image ? base + match.image : p.image, sourceSku: match.id, imageSource: match.imageSource || p.image, verified: '2026-09-21' }];
+  return [{ ...p, familyId: match.familyId, familyName: p.name, variantLabel: match.variantLabel, categoryPath: match.categoryPath, subcategory: match.subcategory, source: match.source, image: match.image ? base + match.image : p.image, sourceSku: match.id, imageSource: match.imageSource || p.image, verified: '2026-09-21' }];
 });
 const replacedIds = new Set(featured.map(p => p.sourceSku));
 export const products: Product[] = [...featured, ...importedProducts.filter(p => !replacedIds.has(p.id)).map(p => ({ ...p, image: p.image ? base + p.image : '', sourceSku: p.id }))];
+export const productFamilies = new Map<string, Product[]>();
+for (const product of products) {
+  const family = productFamilies.get(product.familyId) ?? [];
+  family.push(product);
+  productFamilies.set(product.familyId, family);
+}
 export const categories: Category[] = ['Concrete & cement', 'Tools & equipment', 'Sealants & chemicals', 'Render & finishes', 'Masonry', ...[...new Set(products.map(p => p.category))].filter(c => !['Concrete & cement', 'Tools & equipment', 'Sealants & chemicals', 'Render & finishes', 'Masonry'].includes(c)).sort()];
 export const catalogues = [
   { title: 'Lyndons online product list', subtitle: '3,853 product / variant rows · CSV', description: 'Download the collected public range with descriptions, codes, photo sources and supplier references. Not a complete stocked inventory.', url: base + 'data/lyndons-public-product-list.csv', tag: 'COLLECTED ONLINE RANGE' },

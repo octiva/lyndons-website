@@ -1,6 +1,8 @@
 import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { productMetadata } from './lib/catalogue-policy.mjs';
+import { compactCatalogue } from './lib/compact-catalogue.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = async name => JSON.parse(await readFile(path.join(root, name), 'utf8'));
 const records = await read('research/catalogue/products.json');
@@ -58,11 +60,11 @@ for (const p of records) {
   const variants = p.variants.length ? p.variants : [{ sku: p.sku, label: '' }];
   for (const variant of variants) {
     const id = variant.sku || `${p.id}-${variant.sourceVariantId || 'base'}`;
-    const name = p.name.replace(/^\*+/, '').trim() + (variant.label ? ` — ${variant.label}` : '');
+    const metadata = productMetadata(p, variant);
+    const name = metadata.familyName + (variant.label ? ` — ${variant.label}` : '');
     products.push({
-      id, name, brand: p.brand || 'Brand not listed', manufacturer: p.brand ? `${p.brand} (brand listed by Lyndons; exact manufacturer not independently verified)` : 'Not identified by the source',
+      id, name, ...metadata, brand: p.brand || 'Brand not listed', manufacturer: p.brand ? `${p.brand} (brand listed by Lyndons; exact manufacturer not independently verified)` : 'Not identified by the source',
       category: categories[p.categories[0]?.name] || 'Other supplies',
-      pack: variant.label || 'Pack / unit: confirm with branch',
       description: p.description || `${name}. Detailed specifications are not provided in the source listing. Please confirm the required specification with your branch.`,
       image: image ? `images/products/${path.basename(image.localPath)}` : '',
       imageSource: image?.source || '', source: p.source, supplier: supplier?.url,
@@ -73,6 +75,7 @@ for (const p of records) {
 }
 if (new Set(products.map(p => p.id)).size !== products.length) throw new Error('Duplicate ordering references: resolve before publishing');
 await writeFile(path.join(root, 'src/data/generated/products.json'), JSON.stringify(products));
+await writeFile(path.join(root, 'src/data/generated/catalogue-compact.json'), JSON.stringify(compactCatalogue(products)));
 const summary = { ...report, brands: undefined, failures: undefined, supplierResources: verified.length, productsWithSupplierResource: records.filter(p => supplierByBrand.has(p.brand?.toLowerCase())).length, supplierCoverageNote: 'Brand-level resource matches only; not individual product/manufacturer verification.', downloadedPdfs: [{ name:'Lyndons November 2022 offers flyer', pages:4, file:'catalogues/lyndons-product-catalogue-november-2022.pdf', warning:'Expired promotional prices; not a full-range catalogue.' }, { name:'Lyndons capability statement',pages:20,file:'catalogues/lyndons-capability-statement.pdf',warning:'Company overview, not product inventory.' }] };
 await mkdir(path.join(root, 'public/data'), { recursive: true });
 await writeFile(path.join(root, 'public/data/catalogue-coverage.json'), JSON.stringify(summary, null, 2));

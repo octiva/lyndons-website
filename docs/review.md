@@ -1,5 +1,24 @@
 # Builder → reviewer → judge
 
+## Usability iteration — 21 September 2026
+
+- Reproduced and fixed header/quote branch divergence; one state now controls selection, summary and email recipient.
+- Reusable quantity editing permits blank drafts, reports integer/range errors and blocks progressing with invalid quantities. True source codes display in the cart.
+- Long email handoff explicitly requires a downloaded file plus acknowledgment; readiness resets on quote edits. No automatic sending or attachment claim.
+- 2,061 family cards retain all 3,853 SKUs. Multi-option cards open an unselected size/colour selector; exact SKU searches alone preselect an option. Source photos are identified as shared listing images. Quote actions are above long product descriptions on mobile.
+- Restored source subcategories, consistent category/brand resets, trade synonyms, labelled typo suggestions and exact-SKU ranking.
+- Unified preview-gate state fixes double unlock when session storage is blocked. Locking destroys contact state after confirmation; product basket remains saved. Browser unload warnings are best-effort and exempt download events so Safari downloads remain usable.
+- Catalogue refresh policy compares sitemap lastModified and a configurable seven-day TTL. Limited/stopped/failed runs cannot replace last-complete product exports. Policy tests are offline; no claim of a fresh complete recrawl.
+- Lossless string-table compaction reduces this iteration's uncompressed storefront chunk from ~4.76MB to ~1.91MB. Gzipped chunk decreases from ~557KB to ~530KB; this is not a 60% network saving. Still deferred until unlock; server-side/on-demand data remains future work.
+
+Read-only independent review found no blocking implementation issue; its “production-ready” conclusion was not accepted because real submission, pricing/authentication and catalogue sign-off remain outstanding. Conditional same-component state reconciliation in QuantityInput is guarded and tested; replacing it with an effect was not necessary.
+
+Validation: 81 cases across desktop Chromium, mobile Chromium and mobile WebKit plus 14 Node tests pass. Safari quote tests were also repeated twice (20 passes) after fixing a download/unload-warning interaction. TypeScript, lint, production audit and editor diagnostics are clean. WebKit emulation is not physical-device validation. No customer message was sent.
+
+### Remaining work requiring approved data or services
+
+Verified purchasing units/pack conversions, manufacturer/SKU matching and image permissions; staff-managed data review; secure quote API and CRM credentials; authenticated customer-specific pricing. No payments. Keep the simple design; do not fabricate these integrations or data to claim completeness.
+
 ## Catalogue expansion pass — 21 September 2026
 
 Parallel research covered catalogue discovery, tools, chemicals/materials and hardware/safety supplier resources. A reproducible collector processed all 2,061 public sitemap listings into 3,853 product/variant rows and downloaded 2,063 unique images. Exact manufacturer matching is incomplete and is not claimed.

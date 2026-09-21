@@ -16,6 +16,9 @@ research/catalogue/records/
 research/catalogue/images/
 research/catalogue/products.json
 research/catalogue/products.csv
+research/catalogue/attempt-report.json
+research/catalogue/*.tmp
+research/catalogue/*.bak
 dist
 dist-ssr
 *.local

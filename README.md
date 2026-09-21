@@ -12,11 +12,15 @@ A simple, responsive React + TypeScript storefront for builders. No payment proc
 ## What works
 
 - 3,853 product/variant entries from all 2,061 public sitemap listings; local source photos, descriptions, exact variant codes and supplier-library links where verified. Missing details are explicit, not invented.
-- Product/brand/code search, 18 category groups, brand filters, A–Z sorting, 24-item pagination and accessible detail dialogs. Catalogue loading is deferred until preview unlock.
+- 2,061 grouped product cards retain all 3,853 exact SKU options. Multi-option products require an explicit size/colour selection; exact-SKU searches can preselect that known option.
+- Product/brand/code search with exact-code ranking, trade synonyms and labelled typo suggestions; 18 category groups, source subcategories, brand filters, A–Z sorting and 24-card pagination.
+- Catalogue loading is deferred until unlock and repeated strings are losslessly compacted. Product data is still static (a paginated API remains future work).
 - Saved quote basket with quantities; remembered branch; 12 verified sales-branch contacts.
 - Three steps: basket → contact/job details → review, download, copy or email draft.
 - Pickup/delivery, preferred date, trade account and requests for unlisted products.
-- Email drafting for all branches. **The customer must press Send in their email app.** Large requests require attaching the downloaded file. Download/copy remain available without an email app.
+- One shared branch selection updates the header, checkout, summary and email recipient immediately.
+- Quantities allow temporary blank editing and show errors instead of silent clamping; invalid drafts block progression.
+- Email drafting for all branches. **The customer must press Send in their email app.** Long requests clearly require download and acknowledgment before exposing the draft link. Attachments remain manual; the site cannot verify that a file was saved or attached. Download/copy remain available without an email app.
 - No payment, live stock claim, order confirmation or automatic CRM submission.
 
 ## Development
@@ -25,9 +29,9 @@ Use Node 22 (see [.nvmrc](.nvmrc)). Install with `npm ci`, then `npm run dev`. T
 
 - `npm run build` — TypeScript and production build.
 - `npm run lint` — Oxlint checks.
-- `npx playwright install chromium` — browser installation for testing.
-- `npm test` — desktop/mobile Playwright tests, including axe accessibility checks.
-- `npm run catalogue:collect` — resumable source collection (three workers; respects access restrictions).
+- `npx playwright install chromium webkit` — browser installation for testing.
+- `npm test` — import-policy/extraction/compaction tests plus desktop Chromium, mobile Chromium and mobile WebKit tests, including axe checks. WebKit emulation is not testing on a physical iPhone.
+- `npm run catalogue:collect` — resumable source collection (three workers; respects access restrictions). Refreshes changed sitemap timestamps or caches older than seven days. Use `-- --refresh` to force refresh or `CATALOGUE_TTL_DAYS` to change the TTL. Limited/incomplete/stopped runs retain the last complete published collection and write a separate attempt report.
 - `npm run catalogue:prepare` — build local image/product assets and verify supplier resource links.
 - `node scripts/catalogue-manifest.mjs` — PDF checksums and spreadsheet export.
 - VS Code task **Preview Lyndons website** serves the build at http://127.0.0.1:4319/lyndons-website/ (build first).
@@ -36,7 +40,7 @@ GitHub Actions builds, lints and tests before publishing `dist`. Pages uses **Gi
 
 ## Data and privacy
 
-Only product IDs, quantities and branch preference use localStorage. Contact/job details stay in React memory; they survive browsing in the same session but clear on refresh or unlocking a new preview session. Nothing is automatically sent to a server or analytics service. Product photos are downloaded and hosted with this preview. Downloaded quote files and email drafts contain the entered details.
+Only product IDs, quantities and branch preference use localStorage. Contact/job details stay in React memory and survive browsing in the same session. Leaving/reloading a populated draft requests a browser warning where supported; mobile browsers may still discard a tab without warning. Locking asks before discarding a draft and unmounts the storefront to clear it. Nothing is automatically sent to a server or analytics service. Product photos are downloaded and hosted with this preview. Downloaded quote files and email drafts contain the entered details.
 
 ## Scope and handover
 

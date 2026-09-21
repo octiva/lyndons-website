@@ -1,8 +1,43 @@
 import { products } from '../data/catalog';
 
-export interface CartLine { id: string; quantity: number }
-export interface QuoteDetails { name: string; email: string; phone: string; company: string; branch: string; fulfilment: 'pickup' | 'delivery'; address: string; date: string; notes: string; account: string }
-export const emptyDetails: QuoteDetails = { name: '', email: '', phone: '', company: '', branch: 'Windsor', fulfilment: 'pickup', address: '', date: '', notes: '', account: '' };
+export interface CartLine {
+  id: string;
+  quantity: number;
+}
+
+export interface QuoteDetails {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  branch: string;
+  fulfilment: 'pickup' | 'delivery';
+  address: string;
+  date: string;
+  notes: string;
+  account: string;
+}
+
+export const emptyDetails: QuoteDetails = {
+  name: '', email: '', phone: '', company: '', branch: 'Windsor',
+  fulfilment: 'pickup', address: '', date: '', notes: '', account: '',
+};
+
+export const QUOTE_REQUEST_FILENAME = 'lyndons-quote-request.txt';
+
+export function quoteEmail(text: string, details: QuoteDetails, email: string) {
+  const requiresAttachment = encodeURIComponent(text).length >= 1500;
+  const body = requiresAttachment
+    ? `Hello Lyndons ${details.branch},\n\nPlease quote the items in my attached request.\n\nIMPORTANT: Attach the downloaded ${QUOTE_REQUEST_FILENAME} file before sending. The full request is not included in this email body.\n\n${details.name}\n${details.phone}`
+    : text;
+  const subject = `Quote request — ${details.company || details.name}`;
+
+  return {
+    requiresAttachment,
+    href: `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+  };
+}
+
 export function safeCart(value: unknown): CartLine[] {
   if (!Array.isArray(value)) return [];
   const result = new Map<string, number>();
