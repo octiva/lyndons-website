@@ -1,0 +1,2 @@
+export const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
+export function sessionOpen() { try { return sessionStorage.getItem('lyndons-preview') === 'open'; } catch { return false; } }
