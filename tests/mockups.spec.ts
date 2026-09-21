@@ -6,11 +6,11 @@ async function openMockup(page: Page) {
   await page.goto('mockups/');
   await page.getByLabel('Preview password', { exact: true }).fill('Whitaker');
   await page.getByRole('button', { name: 'View the concepts' }).click();
-  await expect(page.getByRole('heading', { name: 'Materials, tools and practical advice.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Find your building supplies.' })).toBeVisible();
 }
 test('mockup has separate pages and an isolated demo quote', async ({ page }) => {
   await openMockup(page);
-  await expect(page.locator('#content .product-grid')).toHaveCount(0);
+  await expect(page.locator('#home-product-grid .product-card')).toHaveCount(8);
   await expect(page.locator('#content .document-table')).toHaveCount(0);
   await page.getByRole('link', { name: /^Browse products/ }).click();
   await expect(page).toHaveURL(/#\/products$/);
@@ -51,7 +51,7 @@ test('Supply Desk is a different layout with exact-code quick add', async ({ pag
 });
 test('mockup category filters, search, back navigation and document links work', async ({ page }) => {
   await openMockup(page);
-  await page.locator('.category-grid').getByRole('link', { name: /Concrete & cement/ }).click();
+  await page.locator('.range-categories').getByRole('link', { name: /Concrete & cement/ }).click();
   await expect(page.locator('.product-card')).toHaveCount(5);
   const toggle = page.getByRole('button', { name: 'Filters & categories' });
   if (await toggle.isVisible()) await toggle.click();

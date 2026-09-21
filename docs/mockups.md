@@ -6,14 +6,15 @@ Direct concept links: `mockups/?concept=counter#/home` and `mockups/?concept=des
 
 ## Directions
 
-- **A — Trade Counter:** short photographic homepage, traditional maroon product navigation, clean grid listing, dedicated detail page. Recommended baseline.
+- **A — Trade Counter (revised 22 September):** prominent fuzzy search, rotating editorial panels, then the full eight-product sample tile view on Home. Traditional maroon navigation and dedicated product/document/quote pages remain.
 - **B — Supply Desk:** compact directory homepage, exact-code quick add, neutral navigation and dense product rows. Switch direction in the review bar on any page to compare the same content.
 
 Both directions have responsive Home, Products, Product, Brands, Catalogues, Branches, Help and Quote views. Hash routes are distinct page views, not anchors in one long homepage. Browser Back/Forward works for route/filter changes. The mockup does not promise production-level scroll restoration.
 
 ## Interactive scope
 
-- Eight real catalogue samples and their downloaded photos; search, category/brand/type filters and sorting.
+- Eight real catalogue samples and their downloaded photos; typo-tolerant search, exact-code ranking, category/brand/type filters and sorting. Home searches update the tile grid while typing; submit moves to results. No fuzzy match automatically adds a product or substitutes a numeric code.
+- Three example editorial panels (resources, branches, supplier catalogue), not fabricated company news, offers or product launches. Rotate every seven seconds, pause on keyboard focus/desktop hover/hidden tab, with explicit pause/play, next/previous and panel buttons. Reduced motion defaults to paused; keyboard focus requires explicit Play to resume.
 - Dedicated product URLs, quantities, temporary quote basket, remove/edit quantities, two sample branch choices.
 - Concept B exact-code quick add supports sample SKUs only.
 - Real downloaded document links with the November 2022 expired-offer warning.
@@ -26,7 +27,9 @@ Both directions have responsive Home, Products, Product, Brands, Catalogues, Bra
 1. Compare the two Home pages at desktop and phone sizes.
 2. Browse Concrete & cement, choose a product, open its dedicated details page.
 3. Add quantity 3 and visit Your quote from the header.
-4. Visit Catalogues: the list is its own page and never appears at the bottom of Home.
+4. Visit Catalogues: the document library is its own page and never appears at the bottom of Home. Product tiles intentionally appear below updates on Home, per the revised brief.
 5. Switch to Supply Desk and try exact code CMNT039.
 
 Decide layout and visual direction before migrating the production catalogue/quote components. Keep existing uncommitted contact-validation work separate from mockup commits/deployment.
+
+The revised mockup has 21 passing desktop/mobile Chromium/WebKit checks, including typo matching, ordering of homepage sections, panel rotation/pause/reduced motion, document links and automated accessibility. The full production catalogue has not been copied into this visual prototype; the tile layout shows all eight sample products. Supply Desk remains unchanged as a comparison.
