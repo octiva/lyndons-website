@@ -11,6 +11,9 @@ A simple, responsive React + TypeScript storefront for builders. No payment proc
 
 ## What works
 
+- Approved Trade Counter design with separate Home, Products, Categories, Brands, product detail, document library, Branches, Help and Your quote destinations. Shareable hash URLs retain filters, pagination and exact product codes; legacy links still work.
+- Homepage order: banner search → rotating factual updates/resources → full product tiles. A second search beside Browse products stays synchronized with the banner; other pages retain the banner search only. Updates include pause controls and respect reduced motion.
+- Favicon uses the actual wheelbarrow figure extracted from the Lyndons logo.
 - 3,853 product/variant entries from all 2,061 public sitemap listings; local source photos, descriptions, exact variant codes and supplier-library links where verified. Missing details are explicit, not invented.
 - 2,061 grouped product cards retain all 3,853 exact SKU options. Multi-option products require an explicit size/colour selection; exact-SKU searches can preselect that known option.
 - Product/brand/code search with exact-code ranking, trade synonyms and labelled typo suggestions; 18 category groups, source subcategories, brand filters, A–Z sorting and 24-card pagination.
@@ -20,6 +23,7 @@ A simple, responsive React + TypeScript storefront for builders. No payment proc
 - Pickup/delivery, preferred date, trade account and requests for unlisted products.
 - One shared branch selection updates the header, checkout, summary and email recipient immediately.
 - Quantities allow temporary blank editing and show errors instead of silent clamping; invalid drafts block progression.
+- Contact validation rejects whitespace-only required details, checks phone formatting and rechecks the local date at submission. This does not verify a phone number or email account exists.
 - Email drafting for all branches. **The customer must press Send in their email app.** Long requests clearly require download and acknowledgment before exposing the draft link. Attachments remain manual; the site cannot verify that a file was saved or attached. Download/copy remain available without an email app.
 - No payment, live stock claim, order confirmation or automatic CRM submission.
 
@@ -37,6 +41,8 @@ Use Node 22 (see [.nvmrc](.nvmrc)). Install with `npm ci`, then `npm run dev`. T
 - VS Code task **Preview Lyndons website** serves the build at http://127.0.0.1:4319/lyndons-website/ (build first).
 
 GitHub Actions builds, lints and tests before publishing `dist`. Pages uses **GitHub Actions** as its source. No API keys are needed. Hash-based navigation works on project Pages without SPA rewrites.
+
+The redesign release passed 195 browser cases across the three configurations and 14 Node tests, plus build, lint and production dependency audit. Historical design comparisons remain under [public/mockups/](public/mockups/index.html); the main React storefront uses the complete collected catalogue, not the mockups' eight samples. Hash routes are not a substitute for prerendered product URLs when public SEO is required.
 
 ## Data and privacy
 

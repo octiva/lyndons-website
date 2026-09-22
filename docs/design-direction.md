@@ -1,6 +1,15 @@
 # Lyndons redesign direction — 22 September 2026
 
-Status: researched proposal, not an implemented redesign. Existing quote-validation work is preserved and not deployed by this review.
+Status: approved Trade Counter direction implemented in the main React storefront. The research/proposal below is retained as historical rationale, not a list of completed features.
+
+## Implemented release
+
+- Separate hash-routed Home, Products, Categories, Brands, product detail, document library, Branches, Help and Quote pages; full 2,061 families / 3,853 options retained.
+- Subsequent user approval changed the original short-home proposal: banner search, rotating factual updates/resources, then paginated product tiles. No invented current news, offers or stock claims.
+- The latest request supersedes the earlier single-search preference: Home and Products have a second synchronized search near Browse products. Other destinations have the banner search only.
+- Actual wheelbarrow-man logo geometry supplies the favicon. Quote/contact validation and privacy safeguards are retained.
+- Saved quote basket, filters, exact-SKU links, history and responsive layouts are implemented. Quick-add/bulk import, grid/list switching, quote drawer, backend submission and authenticated pricing remain future work; no completion is claimed for the wider proposal below.
+- Validation: 195 browser cases and 14 Node tests, build/lint, production audit and desktop/mobile visual review passed. See [review record](review.md).
 
 ## Brief
 

@@ -42,10 +42,11 @@ async function startQuote(page: Page, cart = oneItem) {
       localStorage.setItem('lyndons-quote-v1', JSON.stringify(lines));
     }
   }, cart);
-  await page.goto('./#quote');
+  await page.goto('./#/quote');
   await page.getByLabel('Preview password', { exact: true }).fill('Whitaker');
   await page.getByRole('button', { name: 'Explore the website' }).click();
   await expect(page.getByRole('heading', { name: 'Your quote list', exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/#\/quote$/);
 }
 
 async function fillDetails(page: Page, notes = '') {
@@ -95,6 +96,7 @@ test('empty quantity stays empty on blur, blocks progression, and valid edits pe
   await expect(page.locator('.quote-line').getByRole('alert')).toHaveCount(0);
   await expect.poll(() => savedCart(page)).toEqual([{ id: 'CMNT039', quantity: 12 }]);
   await page.reload();
+  await expect(page).toHaveURL(/#\/quote$/);
   await expect(quantity).toHaveValue('12');
   await page.getByRole('button', { name: 'Increase OneMix Concrete Mix', exact: true }).click();
   await expect(quantity).toHaveValue('13');

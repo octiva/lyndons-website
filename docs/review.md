@@ -1,5 +1,17 @@
 # Builder → reviewer → judge
 
+## Trade Counter migration — 22 September 2026
+
+Implemented the approved visual direction in the main React storefront, not just the standalone mockups. Separate destinations cover browsing, categories, brands, exact-SKU detail, documents, branches, help and quote. All 2,061 families / 3,853 options remain available with URL-backed filters, pagination, legacy links, focus and history handling.
+
+Homepage order follows the revised brief: banner search, rotating factual updates/resources, then product tiles. The latest requested second search appears near Browse products and stays synchronized with the banner. Detail/documents/quote pages retain only the header search. The favicon preserves 55 paths from the actual Lyndons wheelbarrow figure, excluding the lettering.
+
+Contact validation rejects blank-only names/addresses, normalizes optional whitespace, checks plausible phone syntax and rechecks the local date on submission. No identity verification, automatic submission, payment or secure preview authentication is implied. Existing product-only persistence, shared branch, quantity validation and manual attachment handoff remain.
+
+Validation: **195 Playwright cases** across desktop Chromium, mobile Chromium and mobile WebKit, plus **14 Node tests**, TypeScript/build, lint, production dependency audit (zero vulnerabilities), editor diagnostics and diff checks passed. Desktop/mobile screenshots confirm the requested composition and second search. Independent read-only review found no public-preview blockers and independently checked catalogue counts, favicon geometry, search synchronization, nine destinations, axe and 320–1440px overflow. WebKit emulation is not physical-device testing. No customer email was sent.
+
+The existing large static-data chunk advisory remains; pagination limits rendered cards, not the downloaded dataset. Backend submission, authenticated pricing, current inventory approval, manufacturer/pack verification and image permissions are still production prerequisites. The older entries below describe previous releases, not the new page structure.
+
 ## Usability iteration — 21 September 2026
 
 - Reproduced and fixed header/quote branch divergence; one state now controls selection, summary and email recipient.

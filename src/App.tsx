@@ -1,46 +1,49 @@
-import { useEffect, useMemo, useState } from 'react';
-import type { FormEvent } from 'react';
-import { ArrowDown, ArrowRight, CheckCircle2, ChevronDown, ClipboardList, ExternalLink, FileText, Hammer, HardHat, Layers3, LockKeyhole, MapPin, Menu, Package, Phone, Plus, Search, ShieldCheck, SlidersHorizontal, Truck, X } from 'lucide-react';
-import { branches, catalogues, categories, products, productFamilies } from './data/catalog';
-import { searchCatalogue } from './lib/catalogue-search';
-import type { Category, Product } from './data/catalog';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { FormEvent, MouseEvent } from 'react';
+import { ArrowRight, CheckCircle2, ClipboardList, LockKeyhole, MapPin, Menu, Phone, Search, X } from 'lucide-react';
+import { branches, products } from './data/catalog';
 import { emptyDetails, hasRetiredCartItems, loadCart } from './lib/quote';
 import type { CartLine, QuoteDetails } from './lib/quote';
-import { ProductImage } from './components/ProductImage';
-import { ProductDialog } from './components/ProductDialog';
+import { listingHref, useStorefrontRoute } from './lib/storefront-route';
 import { Brand } from './components/PreviewGate';
-import { asset } from './lib/preview';
 import { QuotePage } from './components/QuotePage';
+import { BranchesPage, BrandsPage, CataloguePage, CataloguesPage, CategoriesPage, HelpPage, NotFound, ProductPage } from './components/StorefrontPages';
 import './App.css';
-const categoryIcons = [Layers3, Hammer, ShieldCheck, HardHat, Package];
-const brandNames = [...new Map(products.map(p => [p.brand.toLowerCase(), p.brand])).values()].sort();
-const PAGE_SIZE = 24;
-const howSteps = [{ icon: Search, title: 'Find your supplies', text: 'Search by product, brand or code. Check the photos and details, then add what you need.' }, { icon: ClipboardList, title: 'Build your quote list', text: 'Set your quantities and choose collection or delivery. Add any products you can’t find.' }, { icon: HardHat, title: 'Talk to your local team', text: 'Share your request with a branch. They’ll confirm price, availability and the next steps.' }];
+import './styles/storefront.css';
+
+const navigationLinks = [
+  ['products', 'Products'], ['categories', 'Categories'], ['brands', 'Brands'],
+  ['catalogues', 'Catalogues & data sheets'], ['branches', 'Branches'], ['help', 'Delivery & help'],
+] as const;
+
 function App({ onLock }: { onLock: () => void }) {
+  const { route, navigate, revision, focus, scroll } = useStorefrontRoute();
   const [cart, setCart] = useState<CartLine[]>(loadCart);
   const [storageError, setStorageError] = useState(false);
   const [retiredCartItems] = useState(hasRetiredCartItems);
-  const [page, setPage] = useState(window.location.hash === '#quote' ? 'quote' : 'home');
   const [details, setDetails] = useState<QuoteDetails>(() => {
     let saved: string | null = null;
     try { saved = localStorage.getItem('lyndons-branch'); } catch { /* Memory-only preference. */ }
-    return { ...emptyDetails, branch: branches.some(b => b.name === saved) ? saved! : 'Windsor' };
+    return { ...emptyDetails, branch: branches.some(branch => branch.name === saved) ? saved! : 'Windsor' };
   });
+  const [toast, setToast] = useState('');
+  const [menuAt, setMenuAt] = useState<number | null>(null);
+  const [searchDraft, setSearchDraft] = useState({ revision, value: route.filters.q });
+  const main = useRef<HTMLElement>(null);
+  const lastCatalogue = useRef('#/products');
   const branch = details.branch;
-  function setBranch(value: string) { setDetails(d => ({ ...d, branch: value })); }
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<Category | 'All products'>('All products'); const [brand, setBrand] = useState('All brands'); const [sort, setSort] = useState('featured');
-  const [selected, setSelected] = useState<Product | null>(null); const [toast, setToast] = useState(''); const [menu, setMenu] = useState(false);
-  const [pagination, setPagination] = useState({ key: '', index: 0 });
-  const [subcategory, setSubcategory] = useState('');
-  const [exactSelection, setExactSelection] = useState(false);
+  const currentBranch = branches.find(item => item.name === branch)!;
+  const total = cart.reduce((sum, line) => sum + line.quantity, 0);
+  const menu = menuAt === revision;
+  const query = searchDraft.revision === revision ? searchDraft.value : route.filters.q;
   const dirtyDetails = [details.name, details.email, details.phone, details.company, details.address, details.date, details.notes, details.account].some(value => value.trim());
+
   useEffect(() => {
     if (!dirtyDetails) return;
-    // Some browsers emit beforeunload for a download even though this tab remains.
-    // Allow only the next download-related event; genuine navigation still warns.
+    // Safari can emit beforeunload for a download that leaves this tab open.
+    // Allow one download-related event; genuine document navigation still warns.
     let downloadUntil = 0;
-    const download = (event: MouseEvent) => {
+    const download = (event: globalThis.MouseEvent) => {
       if (event.target instanceof Element && event.target.closest('a[download]')) downloadUntil = Date.now() + 1000;
     };
     const warn = (event: BeforeUnloadEvent) => {
@@ -51,76 +54,99 @@ function App({ onLock }: { onLock: () => void }) {
     window.addEventListener('beforeunload', warn);
     return () => { window.removeEventListener('beforeunload', warn); document.removeEventListener('click', download, true); };
   }, [dirtyDetails]);
-  useEffect(() => { try { localStorage.setItem('lyndons-quote-v1', JSON.stringify(cart)); } catch {
-    // This effect synchronises with external browser storage; report write failure.
-    // oxlint-disable-next-line react/set-state-in-effect
-    setStorageError(true);
-  } }, [cart]);
-  useEffect(() => { try { localStorage.setItem('lyndons-branch', branch); } catch { /* Branch remains available in memory. */ } }, [branch]);
+  useEffect(() => {
+    try { localStorage.setItem('lyndons-quote-v1', JSON.stringify(cart)); } catch {
+      // oxlint-disable-next-line react/set-state-in-effect
+      setStorageError(true);
+    }
+  }, [cart]);
+  useEffect(() => { try { localStorage.setItem('lyndons-branch', branch); } catch { /* Branch remains in memory. */ } }, [branch]);
   useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(''), 4200); return () => clearTimeout(timer); }, [toast]);
-  useEffect(() => { const listener = () => { setPage(location.hash === '#quote' ? 'quote' : 'home'); setMenu(false); }; window.addEventListener('hashchange', listener); return () => window.removeEventListener('hashchange', listener); }, []);
-  const total = cart.reduce((sum, line) => sum + line.quantity, 0); const currentBranch = branches.find(b => b.name === branch)!;
-  const searchResult = useMemo(() => searchCatalogue(query, category, subcategory, brand, sort), [query, category, subcategory, brand, sort]);
-  const filtered = searchResult.families;
-  const subcategories = useMemo(() => [...new Set(products.filter(p => category === 'All products' || p.category === category).map(p => p.subcategory).filter(Boolean))].sort(), [category]);
-  const filterKey = JSON.stringify([query, category, subcategory, brand, sort]);
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageIndex = pagination.key === filterKey ? Math.min(pagination.index, pageCount - 1) : 0;
-  const visibleProducts = filtered.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
-  function changePage(index: number) { setPagination({ key: filterKey, index }); document.getElementById('catalogue-results')?.focus(); document.getElementById('catalogue-results')?.scrollIntoView({ behavior: 'auto' }); }
-  function chooseCategory(value: string) { setCategory(value); setSubcategory(''); setBrand('All brands'); }
-  function openProduct(product: Product) { setExactSelection(searchResult.exactSku(product)); setSelected(product); }
-  function go(hash: string) { setMenu(false); setPage(hash === 'quote' ? 'quote' : 'home'); window.location.hash = hash; if (hash === 'quote') { setDetails(d => ({ ...d, branch })); window.scrollTo(0, 0); } else setTimeout(() => document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' }), 40); }
-  function add(id: string, quantity = 1) { setCart(previous => { const existing = previous.find(l => l.id === id); return existing ? previous.map(l => l.id === id ? { ...l, quantity: Math.min(9999, l.quantity + quantity) } : l) : [...previous, { id, quantity }]; }); setToast(`${products.find(p => p.id === id)!.name} added to your quote`); }
-  function reset() { setQuery(''); chooseCategory('All products'); }
-  function search(event: FormEvent) { event.preventDefault(); if (event.currentTarget instanceof HTMLFormElement && event.currentTarget.classList.contains('header-search')) chooseCategory('All products'); go('products'); }
+
+  useLayoutEffect(() => {
+    if (route.page === 'home' || route.page === 'products') lastCatalogue.current = listingHref('products', route.filters);
+    const heading = main.current?.querySelector<HTMLElement>('h1');
+    document.title = `Lyndons — ${heading?.textContent || 'Products'} | Building & construction supplies`;
+    if (focus === 'none') return;
+    const target = focus === 'results' ? main.current?.querySelector<HTMLElement>('#catalogue-results') : heading ?? main.current;
+    if (target) { target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true }); }
+    if (focus === 'restore') window.scrollTo({ top: scroll, behavior: 'instant' });
+    else if (focus === 'results' && target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 20, behavior: 'instant' });
+    else window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [revision, route, focus, scroll]);
+
+  function setBranch(value: string) {
+    if (branches.some(item => item.name === value)) setDetails(previous => ({ ...previous, branch: value }));
+  }
+  function add(id: string, quantity = 1) {
+    const product = products.find(item => item.id === id);
+    if (!product || !Number.isInteger(quantity) || quantity < 1 || quantity > 9999) return;
+    const existing = cart.find(line => line.id === id);
+    if ((existing?.quantity ?? 0) + quantity > 9999) { setToast('Maximum 9,999 units per product line. Adjust the quantity in your quote.'); return; }
+    setCart(previous => {
+      const present = previous.find(line => line.id === id);
+      return present ? previous.map(line => line.id === id ? { ...line, quantity: Math.min(9999, line.quantity + quantity) } : line) : [...previous, { id, quantity }];
+    });
+    setToast(`${quantity} × ${product.name} added to your quote`);
+  }
+  function typeSearch(value: string) {
+    setSearchDraft({ revision, value });
+    if (route.page === 'home' || route.page === 'products') navigate(listingHref(route.page, { ...route.filters, q: value, page: 1 }), { replace: true, focus: 'none' });
+  }
+  function search(event: FormEvent) {
+    event.preventDefault();
+    navigate(listingHref('products', { q: query.trim() }));
+  }
   function lockPreview() {
     if (dirtyDetails && !window.confirm('Lock this preview and discard your contact/job details? Your product list will stay saved.')) return;
     onLock();
   }
-  return <><a className="skip-link" href="#main">Skip to content</a><div className="utility"><div className="container"><span>Building supplies. Local know-how.</span><span><Truck size={15} /> Site delivery & branch collection <span className="utility-divider">|</span> <span className="preview-label">Design preview</span></span></div></div>
-    <header className="header"><div className="container header-main"><a href="#home" onClick={() => go('home')} aria-label="Lyndons home"><Brand /></a><form className="header-search" role="search" aria-label="Site search" onSubmit={search}><Search size={20} /><input aria-label="Search products" placeholder="Search products, brands or product codes" value={query} onChange={e => setQuery(e.target.value)} /><button type="submit" aria-label="Find products"><ArrowRight size={20} /></button></form><div className="branch-control"><MapPin size={22} /><label>Your local branch<select aria-label="Your local branch" value={branch} onChange={e => setBranch(e.target.value)}>{branches.map(b => <option key={b.name}>{b.name}</option>)}</select></label></div><button className="quote-button" onClick={() => go('quote')} aria-label={`Your quote, ${total} items`}><ClipboardList size={21} /><span>Your quote</span><b>{total}</b></button><button className="icon-button mobile-menu" aria-label={menu ? 'Close menu' : 'Open menu'} aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? <X /> : <Menu />}</button></div><nav className={`navigation ${menu ? 'open' : ''}`} aria-label="Main navigation"><div className="container"><div><a href="#products" onClick={e => { e.preventDefault(); go('products'); }}><Menu size={17} /> Shop products <ChevronDown size={14} /></a><a href="#how-it-works" onClick={e => { e.preventDefault(); go('how-it-works'); }}>How quoting works</a><a href="#resources" onClick={e => { e.preventDefault(); go('resources'); }}>Catalogues & guides</a><a href="#branches" onClick={e => { e.preventDefault(); go('branches'); }}>Find a branch</a></div><a className="nav-phone" href={`tel:${currentBranch.phone.replaceAll(' ', '')}`}><Phone size={15} /> {currentBranch.phone}</a></div></nav></header>
-    {storageError && <p role="status" className="notice container">Your browser can’t save this quote list. Keep this tab open and download your request before leaving.</p>}
-    {retiredCartItems && <p role="status" className="notice container">Some older preview items need to be selected again and were removed from your saved list. For PolyGlow, choose the required colour before adding it. No size or colour was selected automatically.</p>}
-    <main id="main">{page === 'quote' ? <QuotePage cart={cart} setCart={setCart} details={details} setDetails={setDetails} onBrowse={() => go('products')} /> : <>
-      <section className="hero" id="home"><div className="container hero-content"><div className="hero-copy"><span className="eyebrow light"><span className="little-line" /> YOUR PARTNER ON THE JOB</span><h1>The right supplies.<br /><span>Less running around.</span></h1><p>From the first pour to the finishing touches.<br className="desktop-break" /> Find what you need. Build your list. We’ll sort the quote.</p><div className="hero-actions"><button className="button yellow" onClick={() => go('products')}>Find your products <ArrowRight size={18} /></button><button className="hero-link" onClick={() => go('how-it-works')}>How it works <ArrowDown size={16} /></button></div><div className="hero-note"><CheckCircle2 size={17} /> No checkout hassle. No online payment.</div></div><div className="hero-photo"><img src={asset('images/construction.webp')} alt="Construction crew working on a concrete pour" width="712" height="452" fetchPriority="high" /><div className="photo-label"><HardHat size={25} /><div><strong>Built for the trade.</strong><span>Backed by your local team.</span></div></div><span className="photo-corner">LET’S GET TO WORK.</span></div></div></section>
-      <div className="benefits"><div className="container"><div><MapPin /><span><strong>12 Queensland branches</strong><small>Local people who know the job</small></span></div><div><Truck /><span><strong>Collect or get it delivered</strong><small>Talk to us about your site</small></span></div><div><ClipboardList /><span><strong>Your list. Your quote.</strong><small>Pricing confirmed by your branch</small></span></div></div></div>
-      <section id="products" className="container catalogue-section"><div className="section-heading"><div><span className="eyebrow">GET WHAT YOU NEED</span><h2>Supplies for the job ahead.</h2></div><a href="#resources" className="text-button">Catalogues & downloads <ArrowRight size={17} /></a></div><div className="category-tiles">{categories.slice(0, 5).map((cat, i) => { const Icon = categoryIcons[i]; return <button key={cat} className={category === cat ? 'active' : ''} aria-pressed={category === cat} onClick={() => chooseCategory(category === cat ? 'All products' : cat)}><Icon size={27} strokeWidth={1.5} /><span>{cat}</span><ArrowRight size={16} /></button>; })}</div>
-      <div className="catalogue-layout"><aside className="catalogue-sidebar"><h3>Browse products</h3><button className={category === 'All products' ? 'selected' : ''} onClick={() => chooseCategory('All products')}>All products <span>{productFamilies.size}</span></button>{categories.map(cat => <button className={category === cat ? 'selected' : ''} key={cat} onClick={() => chooseCategory(cat)}>{cat}<span>{new Set(products.filter(p => p.category === cat).map(p => p.familyId)).size}</span></button>)}<div className="sidebar-help"><HardHat size={28} /><h3>Not sure what you need?</h3><p>Talk it through with someone who knows the trade.</p><a href={`tel:${currentBranch.phone.replaceAll(' ', '')}`}><Phone size={15} /> Call {branch}</a></div></aside>
-      <div className="product-results" id="catalogue-results" tabIndex={-1}>
-        <div className="filter-bar"><form className="catalogue-search" onSubmit={search} role="search" aria-label="Catalogue search"><Search size={18} /><input aria-label="Search this catalogue" placeholder="Find a product or code…" value={query} onChange={e => setQuery(e.target.value)} />{query && <button type="button" aria-label="Clear search" onClick={() => setQuery('')}><X size={17} /></button>}</form><label className="brand-filter"><SlidersHorizontal size={16} /><span className="sr-only">Filter by brand</span><select value={brand} onChange={e => setBrand(e.target.value)}><option>All brands</option>{brandNames.map(b => <option key={b}>{b}</option>)}</select></label></div>
-        <div className="all-categories">
-          <label htmlFor="category-select">Browse all categories</label>
-          <select id="category-select" aria-label="Browse all categories" value={category} onChange={e => chooseCategory(e.target.value)}>
-            <option>All products</option>
-            {categories.map(c => <option key={c}>{c}</option>)}
-          </select>
-        </div>
-        {category !== 'All products' && subcategories.length > 0 && <div className="all-categories"><label htmlFor="subcategory-select">Narrow by product type</label><select id="subcategory-select" value={subcategory} onChange={e => setSubcategory(e.target.value)}><option value="">All product types</option>{subcategories.map(c => <option key={c}>{c}</option>)}</select></div>}
-        <div className="results-heading"><p aria-live="polite"><strong>{category === 'All products' ? 'Explore the range' : category}</strong><span>{filtered.length.toLocaleString()} products · {searchResult.matches.length.toLocaleString()} options</span></p><label><span className="sr-only">Sort products</span><select value={sort} onChange={e => setSort(e.target.value)}><option value="featured">Featured</option><option value="az">Name: A–Z</option></select></label></div>
-        {searchResult.approximate && <p className="notice" role="status">No exact text match. Showing close matches for “{query}”—check the name and code before adding.</p>}
-        {(category !== 'All products' || query || brand !== 'All brands' || subcategory) && <button className="clear-filters" onClick={reset}><X size={14} /> Clear filters</button>}
-        {filtered.length ? <div className="product-grid">{visibleProducts.map((product, index) => {
-          const family = productFamilies.get(product.familyId)!;
-          const grouped = family.length > 1;
-          const displayName = grouped && !searchResult.exactSku(product) ? product.familyName : product.name;
-          return <article className="product-card" key={product.familyId}>
-            <button className="product-photo" onClick={() => openProduct(product)} aria-label={`View ${displayName}`}><ProductImage product={product} />{index === 0 && pageIndex === 0 && !query && category === 'All products' && <span className="product-tag">JOB-SITE ESSENTIAL</span>}</button>
-            <div className="product-card-body"><span className="product-brand">{product.brand}</span><button className="product-title" onClick={() => openProduct(product)}>{displayName}</button>
-              <p className="product-pack">{grouped ? `${family.length} size / colour options` : product.pack}</p><p className="product-description">{product.description}</p>
-              {product.note && <span className="data-note">Details need confirmation</span>}
-              <div className="card-bottom"><span>Price on request</span><button onClick={() => grouped ? openProduct(product) : add(product.id)} aria-label={grouped ? `Choose options for ${product.familyName}` : `Add ${product.name} to quote`}><Plus size={17} /> {grouped ? 'Choose options' : 'Add to quote'}</button></div>
-            </div>
-          </article>;
-        })}</div> : <div className="no-results"><Search size={36} /><h3>No products found</h3><p>Try a product name, brand or code. Not every stocked item is listed online.</p><button className="button outline" onClick={reset}>Clear filters</button><a href={`tel:${currentBranch.phone.replaceAll(' ', '')}`}>Or call {branch} for help</a></div>}
-      {pageCount > 1 && <nav className="pagination" aria-label="Catalogue pages"><button className="button outline" disabled={pageIndex === 0} onClick={() => changePage(pageIndex - 1)}>Previous</button><label>Page<select aria-label="Catalogue page" value={pageIndex} onChange={e => changePage(Number(e.target.value))}>{Array.from({ length: pageCount }, (_, i) => <option key={i} value={i}>{i + 1} of {pageCount}</option>)}</select></label><button className="button primary" disabled={pageIndex === pageCount - 1} onClick={() => changePage(pageIndex + 1)}>Next <ArrowRight size={16} /></button></nav>}
-      <div className="range-note"><FileText size={22} /><p><strong>Public range, not a live stock list.</strong> {products.length.toLocaleString()} product and variant entries collected from 2,061 Lyndons listings. Imported details and supplier matches still need branch confirmation. Can’t find it? Add it to your quote notes.</p><a href="#resources" aria-label="View catalogues"><ArrowRight size={21} /></a></div></div></div></section>
-      <section id="how-it-works" className="how-section"><div className="container"><div className="section-heading"><div><span className="eyebrow">FROM YOUR LIST TO YOUR JOB SITE</span><h2>A quote, without the runaround.</h2></div><span className="muted">Three simple steps. No payment required.</span></div><div className="how-grid">{howSteps.map(({ icon: Icon, title, text }, i) => <article key={title}><span className="how-number">0{i + 1}</span><Icon size={27} /><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>
-      <section id="resources" className="container resources-section"><div className="section-heading"><div><span className="eyebrow">THE DETAILS THAT MATTER</span><h2>Catalogues & product guides.</h2></div></div><div className="resource-grid">{catalogues.map(c => <a key={c.title} href={c.url} target="_blank" rel="noreferrer" className="resource-card"><div><FileText size={25} /><ExternalLink size={16} /></div><span className="eyebrow">{c.tag}</span><h3>{c.title}</h3><strong>{c.subtitle}</strong><p>{c.description}</p><span className="resource-link">View resource <ArrowRight size={16} /></span></a>)}</div><p className="source-note">No complete current Lyndons PDF catalogue has been verified. The November 2022 PDF is an expired offers flyer, not the full range. Always check current manufacturer technical and safety data.</p></section>
-      <section id="branches" className="branch-section"><div className="container branch-layout"><div><span className="eyebrow light">GOOD PEOPLE. PRACTICAL ADVICE.</span><h2>Your local branch.<br />Part of your crew.</h2><p>Need a hand choosing a product or planning a delivery? Talk to your local Lyndons team.</p><label>Choose your branch<select value={branch} onChange={e => setBranch(e.target.value)}>{branches.map(b => <option key={b.name}>{b.name}</option>)}</select></label></div><div className="branch-card"><span className="eyebrow">YOUR LOCAL TEAM</span><h3><MapPin /> Lyndons {branch}</h3><a className="branch-phone" href={`tel:${currentBranch.phone.replaceAll(' ', '')}`}>{currentBranch.phone}</a><p>Call for stock, quotes and delivery enquiries.</p><a className="button primary full" href={currentBranch.url} target="_blank" rel="noreferrer">Address & opening hours <ExternalLink size={17} /></a><small>Check the branch page for current trading hours.</small></div></div></section>
-    </>}</main>
-    <footer><div className="container footer-main"><div><Brand /><p>Building & construction supplies.<br />Here to help you get on with the job.</p></div><div><strong>Get the job sorted</strong><a href="#products" onClick={() => go('products')}>Browse products</a><a href="#quote" onClick={() => go('quote')}>Your quote list</a><a href="#branches" onClick={() => go('branches')}>Find a branch</a></div><div><strong>Good to know</strong><a href="https://lyndons.com.au/customer-service/delivery" target="_blank" rel="noreferrer">Delivery information <ExternalLink size={12} /></a><a href="https://lyndons.com.au/privacy-policy" target="_blank" rel="noreferrer">Privacy policy <ExternalLink size={12} /></a><button className="text-button" onClick={lockPreview}><LockKeyhole size={13} /> Lock preview</button></div></div><div className="container footer-bottom"><span>© {new Date().getFullYear()} Lyndons · Website concept preview</span><span>Quote-only. No online payments.</span></div></footer>
-    <div className="mobile-dock"><button onClick={() => go('products')}><Search size={20} /><span>Products</span></button><button onClick={() => go('branches')}><MapPin size={20} /><span>Branches</span></button><button onClick={() => go('quote')}><ClipboardList size={20} /><span>Your quote {total > 0 && <b>{total}</b>}</span></button></div><div className={`toast ${toast ? 'visible' : ''}`} role="status" aria-live="polite">{toast && <><CheckCircle2 size={20} /><span>{toast}</span><button onClick={() => go('quote')}>View quote <ArrowRight size={16} /></button></>}</div>{selected && <ProductDialog key={selected.id} product={selected} exactSelection={exactSelection} onClose={() => setSelected(null)} onAdd={add} />}
-  </>;
+  function internalLink(event: MouseEvent<HTMLDivElement>) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const anchor = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href]') : null;
+    const href = anchor?.getAttribute('href');
+    if (!anchor || anchor.target || anchor.hasAttribute('download') || !href?.startsWith('#/')) return;
+    event.preventDefault();
+    navigate(href, { focus: anchor.dataset.routeFocus === 'results' ? 'results' : 'page' });
+  }
+  function pageContent() {
+    switch (route.page) {
+      case 'home': case 'products': return <CataloguePage key={route.page} route={route} navigate={navigate} onAdd={add} branch={branch} />;
+      case 'product': return <ProductPage route={route} navigate={navigate} onAdd={add} branch={branch} />;
+      case 'categories': return <CategoriesPage />;
+      case 'catalogues': return <CataloguesPage />;
+      case 'brands': return <BrandsPage />;
+      case 'branches': return <BranchesPage branch={branch} setBranch={setBranch} />;
+      case 'help': return <HelpPage />;
+      case 'quote': return <QuotePage cart={cart} setCart={setCart} details={details} setDetails={setDetails} onBrowse={() => navigate(lastCatalogue.current)} />;
+      default: return <NotFound />;
+    }
+  }
+  const activePage = route.page === 'product' ? 'products' : route.page;
+
+  return <div className="trade-site" onClick={internalLink}>
+    <a className="skip-link" href="#main" onClick={event => { event.preventDefault(); main.current?.focus(); main.current?.scrollIntoView({ behavior: 'instant' }); }}>Skip to content</a>
+    <div className="trade-service-bar"><div className="trade-wrap"><span>Building & construction supplies</span><a href="#/branches">{branches.length} Queensland branches <MapPin size={13} /></a></div></div>
+    <header className="trade-header">
+      <div className="trade-wrap trade-masthead">
+        <a href="#/home" aria-label="Lyndons home"><Brand /></a>
+        <form className="trade-search header-search" role="search" aria-label="Product search" onSubmit={search}>
+          <label className="sr-only" htmlFor="storefront-search">Search products or product codes</label>
+          <input id="storefront-search" type="search" placeholder="Search products, brands or product codes" autoComplete="off" maxLength={200} value={query} onChange={event => typeSearch(event.target.value)} />
+          <button type="submit" aria-label="Search products"><Search size={22} /></button>
+        </form>
+        <div className="trade-branch-control"><MapPin size={21} /><label>Your local branch<select aria-label="Your local branch" value={branch} onChange={event => setBranch(event.target.value)}>{branches.map(item => <option key={item.name}>{item.name}</option>)}</select></label></div>
+        <a className="trade-quote-link" href="#/quote" aria-label={`Your quote, ${total} items`} aria-current={route.page === 'quote' ? 'page' : undefined}><ClipboardList size={22} /><span>Your quote</span><b>{total}</b></a>
+        <button className="trade-menu-toggle" type="button" aria-label={menu ? 'Close menu' : 'Open menu'} aria-expanded={menu} aria-controls="trade-navigation" onClick={() => setMenuAt(menu ? null : revision)}>{menu ? <X size={20} /> : <Menu size={20} />}<span>Menu</span></button>
+      </div>
+      <nav id="trade-navigation" className={`trade-navigation ${menu ? 'is-open' : ''}`} aria-label="Main navigation"><div className="trade-wrap">{navigationLinks.map(([page, label]) => <a key={page} href={`#/${page}`} aria-current={activePage === page ? 'page' : undefined}>{label}</a>)}<a className="trade-nav-phone" href={`tel:${currentBranch.phone.replaceAll(' ', '')}`}><Phone size={14} />{currentBranch.phone}</a></div></nav>
+    </header>
+    {storageError && <p role="status" className="trade-notice trade-wrap">Your browser can’t save this quote list. Keep this tab open and download your request before leaving.</p>}
+    {retiredCartItems && <p role="status" className="trade-notice trade-wrap">Some older preview items need to be selected again and were removed from your saved list. For PolyGlow, choose the required colour before adding it. No size or colour was selected automatically.</p>}
+    <main id="main" ref={main} tabIndex={-1} className={route.page === 'quote' ? 'trade-quote-content' : 'trade-content'} data-page={route.page}>{pageContent()}</main>
+    <footer className="trade-footer"><div className="trade-wrap trade-footer-main"><div><Brand /><span>Building & construction supplies</span></div><nav aria-label="Footer navigation"><a href="#/products">Browse products</a><a href="#/catalogues">Catalogues & data sheets</a><a href="#/branches">Contact a branch</a><a href="#/help">Help with a quote</a></nav></div><div className="trade-wrap trade-footer-fine"><span>© {new Date().getFullYear()} Lyndons · Website preview · Quote-only. No online payments.</span><a href="https://lyndons.com.au/privacy-policy" target="_blank" rel="noreferrer">Privacy policy</a><button type="button" onClick={lockPreview}><LockKeyhole size={14} />Lock preview</button></div><p className="trade-wrap trade-footer-disclaimer">Prices and availability are confirmed by your branch. The client-side preview gate is not secure authentication.</p></footer>
+    <div className={`trade-toast ${toast ? 'is-visible' : ''}`} role="status" aria-live="polite" aria-atomic="true">{toast && <><CheckCircle2 size={19} /><span>{toast}</span><a href="#/quote">View quote <ArrowRight size={15} /></a><button type="button" aria-label="Dismiss notification" onClick={() => setToast('')}><X size={17} /></button></>}</div>
+  </div>;
 }
+
 export default App;

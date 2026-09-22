@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, FocusEvent, FormEvent } from 'react';
 import {
   ArrowLeft, ArrowRight, Check, CheckCircle2, ClipboardList, Download,
   ExternalLink, FileText, Mail, MapPin, Trash2, Truck,
@@ -6,6 +7,8 @@ import {
 import { branches, products } from '../data/catalog';
 import { QUOTE_REQUEST_FILENAME, quoteEmail, quoteText } from '../lib/quote';
 import type { CartLine, QuoteDetails } from '../lib/quote';
+import { contactValidationFields, localDateString, normalizeContactDetails, validateContactDetails } from '../lib/contact-validation';
+import type { ContactValidationErrors, ContactValidationField } from '../lib/contact-validation';
 import { ProductImage } from './ProductImage';
 import { QuantityInput } from './QuantityInput';
 
@@ -104,10 +107,8 @@ function EmailHandoff({ text, details, email }: { text: string; details: QuoteDe
 
 export function QuotePage({ cart, setCart, details, setDetails, onBrowse }: QuotePageProps) {
   const [step, setStep] = useState(1);
-  const [today] = useState(() => {
-    const now = new Date();
-    return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  });
+  const [contactErrors, setContactErrors] = useState<ContactValidationErrors>({});
+  const today = localDateString(new Date());
   const [invalidQuantities, setInvalidQuantities] = useState<ReadonlySet<string>>(() => new Set());
   const heading = useRef<HTMLHeadingElement>(null);
   const text = quoteText(cart, details);
@@ -120,6 +121,56 @@ export function QuotePage({ cart, setCart, details, setDetails, onBrowse }: Quot
 
   function update<Key extends keyof QuoteDetails>(key: Key, value: QuoteDetails[Key]) {
     setDetails({ ...details, [key]: value });
+    if (key === 'fulfilment') {
+      // Delivery's control (and its native custom validity) unmounts on pickup.
+      setContactErrors(previous => ({ ...previous, address: undefined }));
+    }
+  }
+
+  function contactInput(field: ContactValidationField) {
+    function validate(input: HTMLInputElement | HTMLTextAreaElement) {
+      const error = validateContactDetails({ ...details, [field]: input.value }, new Date())[field];
+      input.setCustomValidity(error ?? '');
+      return error;
+    }
+
+    return {
+      name: field,
+      'aria-invalid': contactErrors[field] ? true : undefined,
+      'aria-describedby': contactErrors[field] ? `quote-${field}-error` : undefined,
+      onChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        update(field, event.currentTarget.value);
+        // Clear corrected errors immediately, but announce new ones only after
+        // blur or submission rather than while someone is still typing.
+        if (!validate(event.currentTarget)) {
+          setContactErrors(previous => ({ ...previous, [field]: undefined }));
+        }
+      },
+      onBlur(event: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        const error = validate(event.currentTarget);
+        setContactErrors(previous => ({ ...previous, [field]: error }));
+      },
+    };
+  }
+
+  function submitDetails(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const now = new Date();
+    const errors = validateContactDetails(details, now);
+    for (const field of contactValidationFields) {
+      const input = form.elements.namedItem(field);
+      if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+        if (field === 'date' && input instanceof HTMLInputElement) input.min = localDateString(now);
+        input.setCustomValidity(errors[field] ?? '');
+      }
+    }
+    setContactErrors(errors);
+    // The form defers automatic checking so even stale custom errors and date
+    // bounds are refreshed first. Native required/email/min checks still run.
+    if (!form.reportValidity()) return;
+    setDetails(normalizeContactDetails(details));
+    setStep(3);
   }
 
   function quantity(id: string, value: number) {
@@ -200,27 +251,32 @@ export function QuotePage({ cart, setCart, details, setDetails, onBrowse }: Quot
             </div>
           )}
           {step === 2 && (
-            <form id="quote-details" className="details-form" onSubmit={event => { event.preventDefault(); setStep(3); }}>
+            <form id="quote-details" className="details-form" noValidate onSubmit={submitDetails}>
               <h2>How can we reach you?</h2>
               <p>Required fields are marked *. Contact details stay in this tab only; refreshing or closing it clears them. Download your request before leaving.</p>
               <div className="form-grid">
-                <label>Your name *
-                  <input autoComplete="name" required maxLength={100} value={details.name} onChange={event => update('name', event.target.value)} />
-                </label>
+                <div>
+                  <label>Your name *
+                    <input autoComplete="name" required maxLength={100} value={details.name} {...contactInput('name')} />
+                  </label>
+                  {contactErrors.name && <p id="quote-name-error" className="error" role="alert">{contactErrors.name}</p>}
+                </div>
                 <label>Business name
                   <input autoComplete="organization" maxLength={120} value={details.company} onChange={event => update('company', event.target.value)} />
                 </label>
                 <label>Email *
                   <input autoComplete="email" type="email" required maxLength={150} value={details.email} onChange={event => update('email', event.target.value)} />
                 </label>
-                <label>Phone *
-                  <input
-                    autoComplete="tel" type="tel" required
-                    pattern={String.raw`[+0-9 \(\)\-]{6,25}`}
-                    title="Enter a phone number using digits, spaces, +, brackets or hyphens."
-                    value={details.phone} onChange={event => update('phone', event.target.value)}
-                  />
-                </label>
+                <div>
+                  <label>Phone *
+                    <input
+                      autoComplete="tel" type="tel" required
+                      title="Enter 6 to 15 digits, using only +, spaces, parentheses or hyphens for formatting."
+                      value={details.phone} {...contactInput('phone')}
+                    />
+                  </label>
+                  {contactErrors.phone && <p id="quote-phone-error" className="error" role="alert">{contactErrors.phone}</p>}
+                </div>
                 <label>Trade account (optional)
                   <input maxLength={60} value={details.account} onChange={event => update('account', event.target.value)} />
                 </label>
@@ -243,13 +299,17 @@ export function QuotePage({ cart, setCart, details, setDetails, onBrowse }: Quot
                 </label>
               </fieldset>
               {details.fulfilment === 'delivery' && (
-                <label>Delivery address *
-                  <textarea autoComplete="street-address" required maxLength={400} value={details.address} onChange={event => update('address', event.target.value)} />
-                </label>
+                <>
+                  <label><span id="quote-address-label">Delivery address *</span>
+                    <textarea aria-labelledby="quote-address-label" autoComplete="street-address" required maxLength={400} value={details.address} {...contactInput('address')} />
+                  </label>
+                  {contactErrors.address && <p id="quote-address-error" className="error" role="alert">{contactErrors.address}</p>}
+                </>
               )}
               <label>Preferred date (optional)
-                <input type="date" min={today} value={details.date} onChange={event => update('date', event.target.value)} />
+                <input type="date" min={today} value={details.date} {...contactInput('date')} />
               </label>
+              {contactErrors.date && <p id="quote-date-error" className="error" role="alert">{contactErrors.date}</p>}
               <label>Other products or job notes
                 <textarea
                   maxLength={2000} rows={4}
